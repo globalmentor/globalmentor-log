@@ -11,6 +11,7 @@ import java.text.FieldPosition;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.StringTokenizer;
 
 /**Singleton class which encapsulates debugging functionality.
@@ -42,68 +43,48 @@ public class Debug
 	/**The class used for displaying information in a graphical user interface.*/
 	private DebugDisplay debugDisplay=null;
 
-		//the available reporting levels
-
-	/**Used in instances in which no level should be used, such as as a parameter
-		to <code>setNotify()</code>.*/
-	public final static int NO_LEVEL=0;
-
-	/**Used to indicate a program's execution path.*/
-	public final static int TRACE_LEVEL=1;
-
-	/**The information-only level, used to convey specific information more than
-		simply program execution location.*/
-	public final static int INFORMATION_LEVEL=2;
-
-	/**Indicates that conditions are possibly adverse.*/
-	public final static int WARN_LEVEL=4;
-
-	/**Indicates an unexpected condition representing an error.*/
-	public final static int ERROR_LEVEL=8;
-
+	/**The available debug reporting levels.*/
+	public enum ReportLevel
+	{
+		/**Indicates the program's execution path.*/
+		TRACE,
+		/**Specific information which should be logged but which are adversity-neutral.*/
+		LOG,
+		/**Indications that conditions are possibly adverse.*/
+		WARN,
+		/**Indicates an unexpected condition representing an error.*/
+		ERROR
+	}; 
+	
 	/**Indicates all levels when specifying, for example, which levels should
 		notify the user.
 	*/
-	public final static int ALL_LEVELS=TRACE_LEVEL|INFORMATION_LEVEL|WARN_LEVEL|ERROR_LEVEL;
+//G***del	public final static int ALL_LEVELS=TRACE_LEVEL|INFORMATION_LEVEL|WARN_LEVEL|ERROR_LEVEL;
 
 	/**The levels that should notify the user.*/
-	private int notifyLevel=ERROR_LEVEL;
+//G***del	private int notifyLevel=ERROR_LEVEL;
 
 	/**The levels that should be reported.*/
-	private int reportLevel=ALL_LEVELS;
+	private EnumSet<ReportLevel> reportLevels=EnumSet.of(ReportLevel.TRACE, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
 
-		//various reporting options
-
-	/**Indicates that no extra information (besides the trace information) should
-		be reported.
-	*/
-	public final static long REPORT_NONE=0;
-
-	/**Indicates that the error level should be reported.*/
-	public final static long REPORT_LEVEL=1;
-
-	/**Indicates that execution time should be reported.*/
-	public final static long REPORT_TIME=2;
-
-	/**Indicates that the thread name should be reported.*/
-	public final static long REPORT_THREAD=4;
-
-	/**Indicates that the location of program execution should be reported.*/
-	public final static long REPORT_LOCATION=8;
+	/**The available reporting options.*/
+	public enum ReportOption
+	{
+		/**Indicates that the error level should be reported.*/
+		LEVEL,	
+		/**Indicates that execution time should be reported.*/
+		TIME,
+		/**Indicates that the thread name should be reported.*/
+		THREAD,
+		/**Indicates that the location of program execution should be reported.*/
+		LOCATION
+	}
 
 	/**Indicates that all information should be reported.*/
-	public final static long REPORT_ALL=REPORT_LEVEL|REPORT_TIME|REPORT_THREAD|REPORT_LOCATION;
+//G***del	public final static long REPORT_ALL=REPORT_LEVEL|REPORT_TIME|REPORT_THREAD|REPORT_LOCATION;
 
 	/**The information that should be reported with each log.*/
-	private long report=REPORT_ALL;
-
-	/**The single copy of the debug frame class that's allowed to be created if needed.*/
-//G***del	private Frame debugFrame=null;
-//G***del when works	private JFrame debugFrame=null;
-
-	/**The text area used to log visible output.*/
-//G***del	private TextArea debugTextArea;
-//G***del when works	private JTextArea debugTextArea;
+	private EnumSet<ReportOption> reportOptions=EnumSet.of(ReportOption.LEVEL, ReportOption.TIME, ReportOption.THREAD, ReportOption.LOCATION);
 
 	/**The stream used to output debug messages. This stream is also used as the
 		output stream if a debuf file is specified.
@@ -142,7 +123,7 @@ public class Debug
 		return getDebug().debugPrintStream;	//return the debug print stream
 	}
 
-	/**Sets the stream used to output debug messages if debug is turned on.
+	/**Sets the stream used to output debug messages when debug is turned on.
 		The default before this function is called is <code>System.out</code>.
 	@param printStream The print stream to use to print debug messages.
 	@see #isDebug
@@ -150,14 +131,11 @@ public class Debug
 	*/
 	public static synchronized void setOutput(final PrintStream printStream)
 	{
+		final Debug debug=getDebug();	//get debug support
+		debug.debugPrintStream=printStream;	//save the print stream they pass
 		if(isDebug())	//if debugging is turned on
 		{
-			final Debug debug=getDebug();	//get the debug object
-			if(printStream!=null)	//if they are passing a valid print stream
-			{
-				debug.debugPrintStream=printStream;	//save the print stream they pass
-				setErr(debug.debugPrintStream);	//redirect the error output to let all errors go to the debug output as well
-			}
+			debug.updateOutput();	//update our output
 		}
 	}
 
@@ -172,7 +150,7 @@ public class Debug
 		return isDebug() ? getDebug().debugFile : null;	//return the file if we're debugging, null if not
 	}
 
-	/**Redirects debug output to a specific file if debug is turned on.
+	/**Redirects debug output to a specific file when debug is turned on.
 	@param file The file in which debug information should be stored, or
 		<code>null</code> to revert back to the standard output.
 	@exception FileNotFoundException Thrown if the specified file is not found
@@ -181,29 +159,51 @@ public class Debug
 	*/
 	public static synchronized void setOutput(final File file) throws FileNotFoundException
 	{
+		final Debug debug=getDebug();	//get debug support
+		if(debug.debugFile!=null)	//if they had a file open already
+		{
+			debug.debugPrintStream.close();	//close the stream to the existing file
+		}
+		debug.debugFile=file;	//show which file we'll use for debugging
 		if(isDebug())	//if debugging is turned on
 		{
-			final Debug debug=getDebug();	//get the debug object
-			if(file!=null)	//if they passed a valid file
-			{
-				final OutputStream outputStream=new FileOutputStream(file);	//open an output stream to the file (open this first so that any error will not affect our current status)
-				if(debug.debugFile!=null)	//if they had a file open already
-					debug.debugPrintStream.close();	//close the stream to the existing file
-				debug.debugFile=file;	//show which file we're using for debugging
-				setOutput(new PrintStream(outputStream));	//create a new print stream to the file and set it as our debug output stream
-			}
-			else	//if they passed null
-			{
-				if(debug.debugFile!=null)	//*only* if they had specified a file before
-				{
-					debug.debugPrintStream.close();	//close the debug print stream, which will be for that file
-					debug.debugFile=null;	//show that a file is no longer specified
-					setOutput(System.out);	//redirect all debugging output back to the standard output
-				}
-			}
+			debug.updateOutput();	//update our output
 		}
 	}
 
+	
+	/**Updates the debug output, based upon whether debug is turned on or off.*/
+	protected void updateOutput()
+	{
+		if(isDebug)	//if debugging is turned on
+		{
+			if(debugFile!=null)	//if we have a debug file
+			{
+				try
+				{
+					debugPrintStream=new PrintStream(new FileOutputStream(debugFile, true));	//open an output stream for appending to the file (open this first so that any error will not affect our current status)
+				}
+				catch(final FileNotFoundException fileNotFoundException)	//if we can't open an output stream to the file
+				{
+					System.err.println(fileNotFoundException);	//indicate an error TODO send this to the existing error stream, if we can
+				}
+			}
+			if(debugPrintStream!=null)	//if a debug print stream is given
+			{
+				setErr(debugPrintStream);	//redirect the error output to let all errors go to the debug output as well
+			}
+		}
+		else	//if debug is turned off
+		{
+			if(debugFile!=null)	//if we have a debug file
+			{
+				debugPrintStream.close();	//close the debug output stream
+			}
+//G***del; this would result in infinite recursion, and isn't necessary, anyway			setOutput(System.out);	//redirect all debugging output back to the standard output
+			setErr(System.err);	//set error output back to its default
+		}
+	}
+	
 	/**An object for formatting the date and time.*/
 	protected DateFormat dateFormat=DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 
@@ -241,10 +241,12 @@ public class Debug
 
 	/**@param object The object for which a status should be returned.
 	@return "null" if the object is <code>null</code>, otherwise "not null".*/
+/*G***del
 	public static String getNullStatus(final Object object)
 	{
 		return object==null ? "null" : "not null";	//return whether this object is null
 	}
+*/
 
 	/**Returns the single debug object after creating it if necessary.
 	@return The singleton debug object.
@@ -252,14 +254,16 @@ public class Debug
 	public static synchronized Debug getDebug()
 	{
 		if(debug==null)	//if there is no debug object, yet
+		{
 			debug=new Debug();	//create a new one
+		}
 		return debug;	//return the single debug object
 	}
 
 	/**@return Whether or not debugging is turned on.*/
 	public static boolean isDebug()
 	{
-		return getDebug().isDebug;
+		return debug!=null ? debug.isDebug : false;	//don't even bother creating a debug object if there isn't one---just report back that debugging isn't turned on
 	}
 
 	/**Sets whether debugging is turned on.
@@ -271,27 +275,14 @@ public class Debug
 		if(newDebug!=debug.isDebug)	//if they are really changing the debug status
 		{
 			debug.isDebug=newDebug;	//update the debug variable
-			if(newDebug)	//if they are turning debug on
-			{
-				setErr(debug.debugPrintStream);	//redirect the error output to let all errors go to the debug output as well
-//G***del; not needed			  trace(new Date().toString()); //output the date, if we're debugging G***use inform() here
-			}
-			else	//if they are turning debug off
-			{
-				try
-				{
-					setOutput((File)null);	//close any output files we may have had open
-				}
-				catch(FileNotFoundException e) {}	//there is no file to find, so this error will never occur here
-				setErr(System.err);	//set error output back to its default
-			}
+			debug.updateOutput();	//update our output to coincide with our new debug status
 		}
 	}
 
 	/**@return Whether or not debugging is visible on the screen.*/
 	public static boolean isVisible()
 	{
-		return getDebug().debugDisplay!=null && getDebug().debugDisplay.isEnabled();	//if we have a displayer, and it's enabled, we're showing output on the screen
+		return isDebug() && getDebug().debugDisplay!=null && getDebug().debugDisplay.isEnabled();	//if we have a displayer, and it's enabled, we're showing output on the screen
 	}
 
 	/**@return Whether or not the Swing classes are available.*/
@@ -330,23 +321,21 @@ public class Debug
 		}
 	}
 
-	/**Returns the debug information reported, which will be one or more of the
-		<code>REPORT_</code> constants ORed together. The default is
-		<code>REPORT_ALL</code>.
+	/**Returns the debug information reported.
+	Defaults to all report options.
 	@return The debug information that will be reported with each log.
 	*/
-	public static long getReport()
+	public static EnumSet<ReportOption> getReportOptions()
 	{
-		return getDebug().report; //return the report variable
+		return getDebug().reportOptions; //return the report options
 	}
 
 	/**Sets the type of information that should be reported with each log.
-	@param newReport The information to be reported on, one or more of the
-		<code>REPORT_</code> constants ORed together.
+	@param options The information to be reported on.
 	*/
-	public static void setReport(final long newReport)
+	public static void setReportOptions(final EnumSet<ReportOption> options)
 	{
-		getDebug().report=newReport;  //update the report variable
+		getDebug().reportOptions=options;  //update the report options
 	}
 
 	/**Returns the report levels for which the user should by notified, which will
@@ -355,113 +344,173 @@ public class Debug
 	@return The log levels that will cause a notification.
 	@see #notifyLevel
 	*/
+/*TODO fix
 	public static int getNotifyLevel()
 	{
 		return getDebug().notifyLevel; //return the notify level variable
 	}
+*/
 
 	/**Sets the log levels that will cause a notification to be given to the user.
 	@param newNotifyLevel The levels that will notify the user, one or more of the
 		<code>_LEVEL</code> constants ORed together.
 	@see #notifyLevel
 	*/
+/*TODO fix
 	public static void setNotifyLevel(final int newNotifyLevel)
 	{
 		getDebug().notifyLevel=newNotifyLevel;  //update the notify level variable
 	}
+*/
 
-	/**Returns the report levels which should actually be logged, which will
-		be one or more of the <code>_LEVEL</code> constants ORed together. The
-		default is <code>ALL_LEVELS</code>.
+	/**Returns the report levels which should actually be logged.
+	Defaults to all available levels.
 	@return The log levels that will be logged.
-	@see #reportLevel
 	*/
-	public static int getReportLevel()
+	public static EnumSet<ReportLevel> getReportLevels()
 	{
-		return getDebug().reportLevel; //return the report level variable
+		return getDebug().reportLevels; //return the report levels
 	}
 
-	/**Sets the log levels that will actually be logged.
-	@param newReportLevel The levels that will be logged, one or more of the
-		<code>_LEVEL</code> constants ORed together.
-	@see #reportLevel
+	/**Sets the report levels that will actually be logged.
+	@param levels The levels that will be logged.
 	*/
-	public static void setReportLevel(final int newReportLevel)
+	public static void setReportLevels(final EnumSet<ReportLevel> levels)
 	{
-		getDebug().reportLevel=newReportLevel;  //update the report level variable
+		getDebug().reportLevels=levels;  //update the report levels
 	}
 
-	/**@return The string representation of the stack trace at the current
-		program location.
+	/**Sets the minimum report levels that will actually be logged.
+	@param minimumLevel The minimum level that will be logged.
+	@see #setReportLevel(EnumSet<ReportLevel>)
 	*/
+	public static void setMinimumReportLevel(final ReportLevel minimumLevel)
+	{
+		final int minimumOrdinal=minimumLevel.ordinal();	//get the ordinal of the minimum level
+		final EnumSet<ReportLevel> levels=EnumSet.of(minimumLevel);	//create a set with the minimum level
+		for(final ReportLevel level:ReportLevel.values())	//for all available report levels
+		{
+			if(level.ordinal()>minimumOrdinal)	//if this level is higher than the minimum
+			{
+				levels.add(level);	//add this level to the set as well
+			}
+		}
+		setReportLevels(levels);	//set the report levels
+	}
+
+	/**@return The string representation of the stack trace at the current program location.*/
+/*G***del
 	public static String getStackTrace()
 	{
 		return getStackTrace(new Throwable());  //return the stack trace of a new throwable object
 	}
+*/
 
-	/**Gets a stack trace of a given error or exception.
+	/**Gets a string representation of a stack trace of a given error or exception.
 	@param throwable The object which holds stack information.
 	@return The stack trace of the given object in string form.
 	*/
-	public static String getStackTrace(final Throwable throwable)
+/*G***del
+	public static String getStackTraceString(final Throwable throwable)
 	{
 		final StringWriter stringWriter=new StringWriter();	//create a string writer that we can write to
 		final PrintWriter stringPrintWriter=new PrintWriter(stringWriter);	//create a new print writer so that the stack trace can write to the string writer
 		throwable.printStackTrace(stringPrintWriter);	//print the stack trace to the string writer
-		//G***eventually remove the Debug lines
 		return stringWriter.toString();	//return the constructed string containing the stack trace
+	}
+*/
+
+	/**Appends a stack trace to a string buffer, including any recursive causes.
+	@param stringBuffer The string buffer to retrieve the stack trace.
+	@param throwable The source of the stack trace, not including any
+		source inside this class.
+	@return The string buffer into which the stack trace was written.
+	*/
+	public static StringBuffer appendStackTrace(final StringBuffer stringBuffer, final Throwable throwable)
+	{
+		stringBuffer.append(throwable).append('\n');	//append the throwable itself
+		final StackTraceElement[] stack=throwable.getStackTrace();	//get the trace of the stack
+		for(final StackTraceElement stackTraceElement:stack)	//for each element on the stack
+		{
+			if(!Debug.class.getName().equals(stackTraceElement.getClassName()))	//if this location was not inside this class
+			{
+				stringBuffer.append('\t').append(stackTraceElement).append('\n');	//append the stack trace element
+			}
+		}
+		final Throwable cause=throwable.getCause();	//get the cause of this throwable
+		if(cause!=null)	//if there is a cause
+		{
+			stringBuffer.append("Cause:");	//Cause:
+			appendStackTrace(stringBuffer, cause);	//recursively append the cause
+		}
+		return stringBuffer;	//return the string buffer, now with the new information
 	}
 
 	/**Writes a debug message to all previously specified locations, such as
 		to the standard output, to the visible log, to disk, etc.
-	@param text The text to write, or <code>null</code> if no text should be output.
+	@param level The reporting level of the log entry.
+	@param stack The stack trace, or <code>null</code> if no stack trace is requested.
+		Trace information from this class will not be included.
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
 	@see #isVisible
 	@see #setVisible
 	*/
-	private static void write(final String text)
+	private static void write(final ReportLevel level, final Object... objects)
 	{
 		final Debug debug=getDebug();	//get the debug object
-		final long report=debug.report;  //get the items we should report
-		//construct a string with time [thread] (location) : text
-		final StringBuffer logStringBuffer=new StringBuffer();  //create a string buffer for constructing our log output
+		final EnumSet<ReportOption> options=debug.reportOptions;  //get the items we should report
+			//construct a string with time level : [thread] location : objects
+		final StringBuffer stringBuffer=new StringBuffer();  //create a string builder for constructing our log output
 //G***fix		if((report&REPORT_LEVEL)!=0)  //if we should report the log level
-		if((report&REPORT_TIME)!=0)  //if we should report the time
+		if(options.contains(ReportOption.LEVEL))	//if we should report the report level
 		{
-			debug.dateFormat.format(new Date(), logStringBuffer, new FieldPosition(0)); //format the date into our string buffer
-		  logStringBuffer.append(' ');  //append a space
+			stringBuffer.append(level).append(' ').append(':');	//level:
 		}
-		if((report&REPORT_THREAD)!=0)  //if we should report the thread
+		if(options.contains(ReportOption.TIME))  //if we should report the time
 		{
-		  logStringBuffer.append('[');  //append a left bracket
-			logStringBuffer.append(Thread.currentThread().getName()); //append the thread name
-		  logStringBuffer.append(']');  //append a right bracket
-		  logStringBuffer.append(' ');  //append a space
+		  stringBuffer.append(' ');  //append a space
+			debug.dateFormat.format(new Date(), stringBuffer, new FieldPosition(0)); //format the date into our string buffer
 		}
-		if((report&REPORT_LOCATION)!=0)  //if we should report the program location
+		if(options.contains(ReportOption.THREAD))  //if we should report the thread
 		{
-//G***del		  logStringBuffer.append('(');  //append a left parenthesis
-			logStringBuffer.append(debug.getProgramLocation()); //append the program location
-//G***del		  logStringBuffer.append(')');  //append a right parenthesis
-		  logStringBuffer.append(' ');  //append a space
+		  stringBuffer.append(' ');  //append a space
+		  stringBuffer.append('[');  //append a left bracket
+			stringBuffer.append(Thread.currentThread().getName()); //append the thread name
+		  stringBuffer.append(']');  //append a right bracket
 		}
-		if(text!=null)  //if we were given text
+		if(options.contains(ReportOption.LOCATION))  //if we should report the program location
 		{
-			logStringBuffer.append(':');  //append a colon
-			logStringBuffer.append(' ');  //append a space
-			logStringBuffer.append(text);  //append the text
+		  stringBuffer.append(' ');  //append a space
+			stringBuffer.append(getProgramLocation()); //append the program location
 		}
-//G***del 		final Date now=new Date();	//get the current date and time
-/*G***del when works
-		final String outputText=debug.getProgramLocation()+" "+ //G***testing
-			debug.dateFormat.format(now)+" ["+Thread.currentThread().getName()+"]: "+text;
-		debug.debugPrintStream.println(outputText);	//send the text using the debug output print stream
-*/
-		final String logString=logStringBuffer.toString();  //get the text we constructed
-		debug.debugPrintStream.println(logString);	//send the text using the debug output print stream
-		debug.debugPrintStream.flush(); //G***testing
-		if(isVisible()/*G***del && text!=null*/)	//if we have visual debugging as well
+		if(objects.length>0)	//if there are objects to output
+		{			
+			stringBuffer.append(' ');  //append a space
+			stringBuffer.append(':');  //append a colon
+			for(final Object object:objects)	//for each object
+			{
+				stringBuffer.append(' ');  //append a space
+				if(object instanceof Throwable)	//if this is a throwable object
+				{
+					appendStackTrace(stringBuffer, (Throwable)object);	//append a stack trace
+				}
+				else	//if this is not a throwable object
+				{
+					stringBuffer.append(object);	//append this object's string value with a separator
+				}
+			}
+		}
+		final String logString=stringBuffer.toString();  //get the text we constructed
+		synchronized(debug.debugPrintStream)	//synchronize on the print stream
+		{
+			debug.debugPrintStream.println(logString);	//send the text using the debug output print stream
+			debug.debugPrintStream.flush(); //make sure the text is flushed to the output
+		}
+		if(isVisible())	//if we have visual debugging as well
+		{
 		  debug.logVisibleText(logString);	//show the text visually
-//G***del when works		  debug.logVisibleText(text);	//show the text visually
+		}
 	}
 
 	/**Logs text visibly to the debug frame, if visible debugging is turned on.
@@ -477,77 +526,34 @@ public class Debug
 		}
 	}
 
-	/**Outputs a stack trace of the given error or exception object.
-	Meant for messages that show the path of program execution and do not
-		represent error conditions.
-	@param throwable The exception object that should be traced.
-	@see #getDebug
-	@see #getNotify
-	@see #isDebug
-	@see #notify
-	@see #error
-	*/
-	public static void trace(final Throwable throwable)
-	{
-		traceStack(throwable);  //trace the throwable object
-	}
-
 	/**Outputs a series of objects to the standard output if debugging is enabled.
 		Meant for messages that show the path of program execution.
-		The objects are converted to a string and sent to the debug trace output on
-		the same line.
 	<p>If no objects are provided, only the trace location will be output.</p>
-	<p>If an object is <code>null</code>, "null" will be output.</p>
-	@param objects The objects to output.
-	@see #getDebug
-	@see #isDebug
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
+	@see ReportLevel#TRACE
 	*/
 	public static void trace(final Object... objects)
 	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
+		if(isDebug() && getReportLevels().contains(ReportLevel.TRACE))	//if tracing is enabled
 		{
-			if(objects.length>0)	//if there are objects to output
-			{
-				final StringBuilder stringBuilder=new StringBuilder();	//we'll create the string manually
-				for(final Object object:objects)	//for each object
-				{
-					stringBuilder.append(object).append(' ');	//append this object's string value with a separator
-				}
-				write(stringBuilder.toString());	//output string string we constructed
-			}
-			else	//if there are no objects
-			{
-				write(null);	//write trace information without a message			
-			}
+			write(ReportLevel.TRACE, objects);	//write the trace information
 		}
 	}
 
-	/**Outputs an integer to the standard output if debugging is enabled.
-	Meant for messages that show the path of program execution.
-	@param traceInt The integer to output.
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void trace(final int traceInt)
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-			write(String.valueOf(traceInt));	//trace with the string version of the integer
-	}
-
-	/**Outputs a message and an integer to the standard output if debugging is enabled.
+	/**Outputs a stack trace and a series of objects to the standard output if debugging is enabled.
 		Meant for messages that show the path of program execution.
-		The integer is concatenated with the trace string only if debugging is
-		enabled, making it slightly more efficient than unconditionally
-		concatenating in the calling method.
-	@param traceString The string to output.
-	@param traceInt The integer to output after the trace string.
-	@see #getDebug
-	@see #isDebug
+	<p>If no objects are provided, only the trace location will be output.</p>
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
+	@see ReportLevel#TRACE
 	*/
-	public static void trace(final String traceString, final int traceInt)
+	public static void traceStack(final Object... objects)
 	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-			write(traceString+traceInt);	//concatenate the with the integer and trace the result
+		if(isDebug() && getReportLevels().contains(ReportLevel.TRACE))	//if tracing is enabled
+		{
+			write(ReportLevel.TRACE, new Throwable(), objects);	//write the trace information
+		}
 	}
 
 	/**Outputs a formatted message to the debug output if debugging is enabled.
@@ -564,47 +570,13 @@ public class Debug
 	@see #getDebug
 	@see #isDebug
 	*/
+/*TODO del or fix
 	public static void trace(final String pattern, final Object[] arguments)
 	{
 		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
 			write(MessageFormat.format(pattern, arguments));	//format the string and trace the result
 	}
-
-	/**Outputs the stack trace to the standard output if debugging is enabled.
-		This represents informational data, not an error condition.
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void traceStack()
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-		{
-			trace(getStackTrace());	//send the text from a stack strace as debug trace output
-		}
-	}
-
-	/**Outputs the stack trace to the standard output if debugging is enabled,
-		after outputting the specified trace text.
-		This represents informational data, not an error condition.
-		The objects are converted to a string and sent to the debug trace output on
-		the same line.
-	<p>If no objects are provided, only the trace stack will be output.</p>
-	<p>If an object is <code>null</code>, "null" will be output.</p>
-	@param objects The objects to output.
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void traceStack(final Object... objects)
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-		{
-			if(objects.length>0)	//if objects were given
-			{
-				trace(objects);	//output the provided objects
-			}
-			traceStack(); //print a stack trace
-		}
-	}
+*/
 
 	/**Outputs the stack trace of a particular error or exception object if
 		debugging is enabled.
@@ -613,6 +585,7 @@ public class Debug
 	@see #getDebug
 	@see #isDebug
 	*/
+/*G***del
 	public static void traceStack(final Throwable throwable)
 	{
 		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
@@ -620,95 +593,78 @@ public class Debug
 			trace(getStackTrace(throwable));	//send the text from a stack strace of the object as debug trace output
 		}
 	}
+*/
 
-	/**Prints a warning message if debugging is turned on.
-	Meant for errors that should not prevent the robust functioning of the program
-		and that are expected to occur infrequently and not because of program design.
-	@param warnString The warning message.
-	@see #getDebug
-	@see #getNotify
-	@see #isDebug
-	@see #notify
+	/**Outputs a series of objects to the standard output if debugging is enabled.
+	Meant for specific information which should be logged but which are adversity-neutral.
+	<p>If no objects are provided, only the trace location will be output.</p>
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
+	@see ReportLevel#LOG
 	*/
-	public static void warn(final String warnString)
+	public static void log(final Object... objects)
 	{
-		if(isDebug() && (getReportLevel() & WARN_LEVEL)>0)	//if debugging is turned on
+		if(isDebug() && getReportLevels().contains(ReportLevel.LOG))	//if logging is enabled
 		{
-			write(warnString);	//write the string
+			write(ReportLevel.LOG, objects);	//write the log information
 		}
 	}
 
-	/**Prints a warning stack trace from an exception if debugging is turned on.
+	/**Outputs a series of objects to the standard output if debugging is enabled.
 	Meant for errors that should not prevent the robust functioning of the program
 		and that are expected to occur infrequently and not because of program design.
-	@param throwable The exception object that represents the warning.
-	@see #getDebug
-	@see #getNotify
-	@see #isDebug
-	@see #notify
+	<p>If no objects are provided, only the trace location will be output.</p>
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
+	@see ReportLevel#WARN
 	*/
-	public static void warn(final Throwable throwable)
+	public static void warn(final Object... objects)
 	{
-		if(isDebug() && (getReportLevel() & WARN_LEVEL)>0)	//if debugging is turned on
+		if(isDebug() && getReportLevels().contains(ReportLevel.WARN))	//if warning is enabled
 		{
-			write(getStackTrace(throwable));	//write the stack trace
+			write(ReportLevel.WARN, objects);	//write the warn information
 		}
 	}
 
-	/**Prints a stack trace and an error message from an exception to the standard
-		error output if debugging is turned on.
-	If debugging the notification includes the error level, the error message is also displayed in dialog box.
+	/**Outputs a series of objects to the standard output if debugging is enabled.
 	Meant for errors that are not expected to occur during normal program operations
 		 -- program logic errors, and exceptions that are not expected to be thrown.
 	Errors are considered so crucial that they are sent to the standard error
 		output even if debugging is turned off.
-	@param throwable The exception object that represents the error
-	@see System.err
-	@see #getDebug
-	@see #getNotify
-	@see #isDebug
-	@see #notify
+	TODO If debugging the notification includes the error level, the error message is also displayed in dialog box.
+	<p>If no objects are provided, only the trace location will be output.</p>
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
+	@see ReportLevel#ERROR
 	*/
-	public static void error(final Throwable throwable) //G***probably allow for the error to be written to the standard error output if debugging is turned off
+	public static void error(final Object... objects)
 	{
-		if(isDebug() && (getReportLevel() & ERROR_LEVEL)>0)	//if debugging is turned on
+		if(getReportLevels().contains(ReportLevel.ERROR))	//if error reporting is enabled
 		{
-			traceStack(throwable);  //trace the stack
-			error(throwable.toString());	//do the default handling of the error
-		}
-		else  //if we aren't debugging
-		{
-			throwable.printStackTrace(System.err);  //send a stack trace to the standard error output
-		}
-	}
-
-	/**Sends an error message to the standard error output if debugging is turned on.
-	If the notification includes the error level, the error message is also
-	displayed in dialog box.
-	Meant for errors that are not expected to occur during normal program operations
-		 -- program logic errors, and exceptions that are not expected to be thrown.
-	Errors are considered so crucial that they are sent to the standard error
-		output even if debugging is turned off.
-	@param errorString The error message.
-	@see System.err
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void error(final String errorString)
-	{
-		if(isDebug() && (getReportLevel() & ERROR_LEVEL)>0)	//if debugging is turned on
-		{
-			traceStack(errorString);	//write the string to the debug error output, along with the stack trace
-			if((getNotifyLevel() & ERROR_LEVEL)!=0)	//if we should notify for error conditions
+			if(isDebug())	//if debug is turned on
 			{
-				if(getDebug().debugDisplay!=null) //if we have something with which to display notifications
-					getDebug().debugDisplay.error(errorString);  //let the debug display object show the error
+				write(ReportLevel.ERROR, objects);	//write the error information
 			}
-		}
-		else  //if we aren't debugging
-		{
-			System.err.println(errorString);  //send the error to the standard error output
-			new Throwable().printStackTrace(System.err);  //send a stack trace to the standard error output
+			else	//if debug is turned off
+			{
+				boolean foundThrowable=false;	//we'll see if a throwable object was passed
+				for(final Object object:objects)	//look at each object
+				{
+					if(object instanceof Throwable)	//if this is a throwable object
+					{
+						foundThrowable=true;	//show that we found a throwable object
+						((Throwable)object).printStackTrace(System.err);  //send a stack trace to the standard error output
+					}
+					else	//if this is not a throwable object
+					{
+						System.err.println(object);	//send the object to the standard error output
+					}
+				}
+				if(!foundThrowable)	//if no throwable object was found TODO do this for debugging, too
+				{
+					new Throwable().printStackTrace(System.err);  //send a stack trace to the standard error output					
+				}
+			}
 		}
 	}
 
@@ -752,6 +708,7 @@ public class Debug
 	@param exception The exception for which an error message should be returned.
 	@return The error message for the exception.
 	*/
+/*G***del
 	public static String getErrorMessage(final Exception exception)
 	{
 		if(exception instanceof FileNotFoundException)	//if a file was not found
@@ -768,12 +725,14 @@ public class Debug
 			return message!=null ? message : exception.getClass().getName();  //if the message is null, use the class name of the exception as the message
 		}
 	}
+*/
 
 	/**Unconditionally displays an error message for an exception.
 //G***fix	@param title The error message box title.
 	@param exception The exception that caused the error.
 	*/
-	public static void notifyError(/*G***fix final String title, */final Exception exception)
+//G***del	public static void notifyError(/*G***fix final String title, */final Exception exception)
+	/*G***del
 	{
 		error(exception);	//log the error
 //G***del; this is a user-interface function, so probably do it even if debug has already done it, using the user-friendly error message		if(!isDebug() || (getNotify()&ERROR_LEVEL)==0)	//if we don't have debug turned on, or notifications are turned off for errors
@@ -782,44 +741,24 @@ public class Debug
 				getDebug().debugDisplay.error(getErrorMessage(exception));  //let the debug display object show a user-friendly error
 		}
 	}
+*/
 
-	/**Returns a string description of the last line of program execution before
-		a <code>Debug</code> method was entered. This is JVM implementation
-		dependent, but a typical result would be,
-		"com.mycompany.MyClass.text(MyClass.java:234)".
-		<p>The success of this method depends on the JVM implementation of the
-		<code>Thread.printStackTrace()</code> method, specifically that each program
-		line begins with "at " and includes the class name.</p>
-	@return A string representation of the last line of program execution, or the
-		empty string if the program location could not be determined.
-	*/  //G***maybe make this a public static routine
-	public String getProgramLocation()
+	/**Returns a stack trace element of the last line of program execution before
+		a <code>Debug</code> method was entered.
+	@return A stack trace element representing the last line of program execution before
+		a <code>Debug</code> method was entered.
+	*/
+	public static StackTraceElement getProgramLocation()
 	{
-		final String stackTrace=getStackTrace(); //get a stack trace at the current location
-		//create a string tokenizer to read the contents of the stack trace line by line
-		final StringTokenizer stringTokenizer=new StringTokenizer(stackTrace, "\r\n"); //G***maybe use a constant here
-		while(stringTokenizer.hasMoreTokens())  //while there are more tokens
+		final StackTraceElement[] stack=new Throwable().getStackTrace();	//get the current stack
+		for(final StackTraceElement stackTraceElement:stack)	//look at each item on the stack
 		{
-			final String location=stringTokenizer.nextToken();  //get the next token, which should be a line of program execution
-			final int atIndex=location.indexOf("at ");  //find the index of "at " G***use a constant here
-		  //if we've found a stack trace line (indicated by the "at") that isn't
-			//  in the Debug class (indicated by the lack of the Debug class name)
-		  if(atIndex>=0 && location.indexOf("com.garretwilson.util.Debug")<0) //G***use constants here
+			if(!Debug.class.getName().equals(stackTraceElement.getClassName()))	//if this location was not inside this class
 			{
-				return location.substring(atIndex); //remove the "at " and return the location G***use a constant here
+				return stackTraceElement;	//return this location
 			}
 		}
-		return "";  //show that we can't determine the program location
+		throw new AssertionError("Could not find non-debug program location.");	//this should never happen, because program execution never starts inside this class
 	}
 
-	/**Converts a throwable into an assertion error.
-	The message of the assertion error will be identical to the throwable, and
-	the cause of the assertion error will be initialized to the given throwable.
-	@param throwable The cause of the problem.
-	@return A new assertion error initialized from the throwable.
-	*/
-	public static AssertionError toAssertionError(final Throwable throwable)	//TODO maybe remove this method in favor of new AssertionError(Throwable)
-	{
-		throw (AssertionError)new AssertionError(throwable.getMessage()).initCause(throwable); 
-	}
 }
