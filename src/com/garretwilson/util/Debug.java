@@ -1011,4 +1011,14 @@ public class Debug
 		return "";  //show that we can't determine the program location
 	}
 
+	/**Converts a throwable into an assertion error.
+	The message of the assertion error will be identical to the throwable, and
+	the cause of the assertion error will be initialized to the given throwable.
+	@param throwable The cause of the problem.
+	@return A new assertion error initialized from the throwable.
+	*/
+	public static AssertionError toAssertionError(final Throwable throwable)
+	{
+		throw (AssertionError)new AssertionError(throwable.getMessage()).initCause(throwable); 
+	}
 }
