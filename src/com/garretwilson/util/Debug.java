@@ -922,22 +922,6 @@ public class Debug
 		}
 	}
 
-	/**If the assert condition is <code>true</code> and debugging is turned on,
-		sends the error message to the appropriate location using <code>error()</code>.
-		Example: <code>Debug.assert(var!=null, "var was null.");</code>
-	@param condition The test condition.
-	@param errorMessage The message to use if the assert condition evaluates to
-		<code>true</code>.
-	@see #error
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void assert(final boolean condition, final String errorMessage)
-	{
-		if(!condition && isDebug())	//if the test does not evaluate to true and debug is turned on G***do we want to check the reporting level here?
-			error("Assertion failed: "+errorMessage);	//print an error showing the assertion failed G***i8n
-	}
-
 	/**Unconditionally displays a message dialog with the given message, whether
 		or not debugging is enabled. If debugging is enabled, the message is traced
 		as well.
