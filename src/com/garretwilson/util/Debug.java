@@ -7,13 +7,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.*;
 import java.text.FieldPosition;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
-import com.garretwilson.lang.StringUtilities;
 
 /**Singleton class which encapsulates debugging functionality.
 @author Garret Wilson
@@ -675,7 +673,6 @@ public class Debug
 	{
 		if(isDebug() && (getReportLevel() & ERROR_LEVEL)>0)	//if debugging is turned on
 		{
-			//G***why not just call stackTrace()?
 			traceStack(throwable);  //trace the stack
 			error(throwable.toString());	//do the default handling of the error
 		}
@@ -821,7 +818,7 @@ public class Debug
 	@param throwable The cause of the problem.
 	@return A new assertion error initialized from the throwable.
 	*/
-	public static AssertionError toAssertionError(final Throwable throwable)
+	public static AssertionError toAssertionError(final Throwable throwable)	//TODO maybe remove this method in favor of new AssertionError(Throwable)
 	{
 		throw (AssertionError)new AssertionError(throwable.getMessage()).initCause(throwable); 
 	}
