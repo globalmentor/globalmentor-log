@@ -767,12 +767,6 @@ public class Debug
 		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
 		{
 			trace(getStackTrace());	//send the text from a stack strace as debug trace output
-/*G***del when works
-			final StringWriter stringWriter=new StringWriter();	//create a string writer that we can write to
-			final PrintWriter stringPrintWriter=new PrintWriter(stringWriter);	//create a new print writer so that the stack trace can write to the string writer
-			new Throwable().printStackTrace(stringPrintWriter);	//print the stack trace to the string writer
-			trace(stringWriter.toString());	//send the text from the stack strace as debug trace output
-*/
 		}
 	}
 
@@ -789,12 +783,6 @@ public class Debug
 		{
 			trace(traceText);	//output the provided text
 			traceStack(); //print a stack trace G***testing
-/*G***del when works
-			final StringWriter stringWriter=new StringWriter();	//create a string writer that we can write to
-			final PrintWriter stringPrintWriter=new PrintWriter(stringWriter);	//create a new print writer so that the stack trace can write to the string writer
-			new Throwable().printStackTrace(stringPrintWriter);	//print the stack trace to the string writer
-			trace(stringWriter.toString());	//send the text from the stack strace as debug trace output
-*/
 		}
 	}
 
@@ -814,31 +802,26 @@ public class Debug
 	}
 
 
-	/**Prints a warning message from if debugging is turned on.
-	If debugging the notification includes the error level, the error message is also displayed in dialog box.
+	/**Prints a warning message if debugging is turned on.
 	Meant for errors that should not prevent the robust functioning of the program
 		and that are expected to occur infrequently and not because of program design.
-	Currently this method duplicates the functionality of <code>error()</code>.
-	@param errorString The error message.
+	@param warnString The warning message.
 	@see #getDebug
 	@see #getNotify
 	@see #isDebug
 	@see #notify
 	*/
-	public static void warn(final String errorString)
+	public static void warn(final String warnString)
 	{
 		if(isDebug() && (getReportLevel() & WARN_LEVEL)>0)	//if debugging is turned on
 		{
-			error(errorString); //G***fix with real warning
+			write(warnString);	//write the string
 		}
 	}
 
-	/**Prints a stack trace and a warning message from an exception if debugging
-		is turned on.
-	If debugging the notification includes the error level, the error message is also displayed in dialog box.
+	/**Prints a warning stack trace from an exception if debugging is turned on.
 	Meant for errors that should not prevent the robust functioning of the program
 		and that are expected to occur infrequently and not because of program design.
-	Currently this method duplicates the functionality of <code>error()</code>.
 	@param throwable The exception object that represents the warning.
 	@see #getDebug
 	@see #getNotify
@@ -849,7 +832,7 @@ public class Debug
 	{
 		if(isDebug() && (getReportLevel() & WARN_LEVEL)>0)	//if debugging is turned on
 		{
-			error(throwable); //G***fix with real warning
+			write(getStackTrace(throwable));	//write the stack trace
 		}
 	}
 
