@@ -513,7 +513,8 @@ public class Debug
 				final StringBuilder stringBuilder=new StringBuilder();	//we'll create the string manually
 				for(final Object object:objects)	//for each object
 				{
-					stringBuilder.append(object).append(' ');	//append this object's string value with a separator
+						//TODO fix null better
+					stringBuilder.append(object!=null ? object : "NULL").append(' ');	//append this object's string value with a separator
 				}
 				write(stringBuilder.toString());	//output string string we constructed
 			}
