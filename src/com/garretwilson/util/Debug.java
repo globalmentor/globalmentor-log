@@ -56,10 +56,8 @@ public class Debug
 		ERROR
 	}; 
 	
-	/**Indicates all levels when specifying, for example, which levels should
-		notify the user.
-	*/
-//G***del	public final static int ALL_LEVELS=TRACE_LEVEL|INFORMATION_LEVEL|WARN_LEVEL|ERROR_LEVEL;
+	/**Indicates all reporting levels.*/
+	public final static EnumSet<ReportLevel> ALL_REPORT_LEVELS=EnumSet.of(ReportLevel.TRACE, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
 
 	/**The levels that should notify the user.*/
 //G***del	private int notifyLevel=ERROR_LEVEL;
