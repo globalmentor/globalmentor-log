@@ -1,10 +1,5 @@
 package com.garretwilson.util;
 
-/*G***del
-import java.awt.Frame;
-import java.awt.Component;
-import java.awt.TextArea;
-*/
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,22 +7,12 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-/*G***del
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-*/
 import java.lang.reflect.*;
 import java.text.FieldPosition;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
-/*G***del
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-*/
 import com.garretwilson.lang.StringUtilities;
 
 /**Singleton class which encapsulates debugging functionality.
@@ -56,42 +41,8 @@ public class Debug
 	/**The name of the DebugSwingDisplay class.*/
 	private final static String DEBUGSWINGDISPLAY_CLASS_NAME="com.garretwilson.swing.DebugSwingDisplay";
 
-	/**The name of the JOptionPane class.*/
-//G***del	private final static String JOPTIONPANE_CLASS_NAME="javax.swing.JOptionPane";
-
-	/**The name of the JTextArea class.*/
-//G***del	private final static String JTEXTAREA_CLASS_NAME="javax.swing.JTextArea";
-
-	/**The class for the JFrame; used for reflection for cases in which Swing may not be available.*/
-//G***del	private Class jFrameClass;
-
-		/**The JFrame.dispose() method.*/
-//G***del		private Method jFrameDisposeMethod;
-
-		/**The JFrame.setSize() method.*/
-//G***del		private Method jFrameSetSizeMethod;
-
-	/**The class for the JOptionPane; used for reflection for cases in which Swing may not be available.*/
-//G***del	private Class jOptionPaneClass;
-
-		/**The JOptionPane.showMessageDialog() method.*/
-//G***del		private Method jOptionPaneShowMessageDialogMethod;
-
-	/**The class for the JTextArea; used for reflection for cases in which Swing may not be available.*/
-//G***del	private Class jTextAreaClass;
-
-		/**The JTextArea.append() method.*/
-//G***del		private Method jTextAreaAppendMethod;
-
-		/**The JTextArea.setEditable() method.*/
-//G***del		private Method jTextAreaSetEditableMethod;
-
-		/**The JTextArea.setText() method.*/
-//G***del		private Method jTextAreaSetTextMethod;
-
 	/**The class used for displaying information in a graphical user interface.*/
 	private DebugDisplay debugDisplay=null;
-
 
 		//the available reporting levels
 
@@ -111,9 +62,6 @@ public class Debug
 
 	/**Indicates an unexpected condition representing an error.*/
 	public final static int ERROR_LEVEL=8;
-
-	/**Indicates that the location of program execution should be reported.*/
-//G***del	public final static long REPORT_LOCATION=8;
 
 	/**Indicates all levels when specifying, for example, which levels should
 		notify the user.
@@ -172,18 +120,6 @@ public class Debug
 	@see #setOutput(java.io.PrintStream)
 	*/
 	private File debugFile=null;
-
-	/**@return The stream used to output debug messages.*/
-/*G***del
-	private PrintStream getPrintStream()
-	{
-		return debugPrintStream;
-*/
-/*G***del
-			//return the debug print stream if there is one; if not, return the standard system output stream
-		return debugPrintStream!=null ? debugPrintStream : System.out;
-*/
-//G***del	}
 
 	/**Sets the error output of the application. If any error occur, they are
 		reported to the standard error output.
@@ -280,35 +216,12 @@ public class Debug
 	{
 		try
 		{
-/*G***del
-				//JFrame
-			jFrameClass=Class.forName(JFRAME_CLASS_NAME); //load the JFrame class, if we can
-//G***del		  jFrameDisposeMethod=jFrameClass.getMethod("dispose", new Class[]{});  //get a reference to the JFrame.dispose() method G***use a constant here
-//G***del		  jFrameSetSizeMethod=jFrameClass.getMethod("setSize", new Class[]{Dimension.class});  //get a reference to the JFrame.setSize() method G***use a constant here
-				//JOptionPane
-			jOptionPaneClass=Class.forName(JOPTIONPANE_CLASS_NAME); //load the JOptionPane class, if we can
-			jOptionPaneShowMessageDialogMethod=jOptionPaneClass.getMethod("showMessageDialog",
-				  new Class[]{Component.class, Object.class, String.class, int.class}); //get a reference to the JOptionPane.showMessageDialog() method G***use a constant here
-				//JTextArea
-		  jTextAreaClass=Class.forName(JTEXTAREA_CLASS_NAME); //get the JTextArea class
-		  jTextAreaAppendMethod=jTextAreaClass.getMethod("append", new Class[]{String.class}); //get a reference to the JTextArea.append() method G***use a constant here
-		  jTextAreaSetEditableMethod=jTextAreaClass.getMethod("setEditable", new Class[]{boolean.class}); //get a reference to the JTextArea.setEditable() method G***use a constant here
-		  jTextAreaSetTextMethod=jTextAreaClass.getMethod("setText", new Class[]{String.class}); //get a reference to the JTextArea.setText() method G***use a constant here
-*/
-/*G***fix
-
-			    frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-			    scrollPane.getViewport().add(textArea, null);
-					frame.validate();	//validate the frame, now that we've added all the components
-					frame.setVisible(true);	//show the debug frame
-*/
 			Class.forName(JFRAME_CLASS_NAME); //load the JFrame class, if we can
 			isSwingAvailable=true;  //if this didn't cause an error, we know that Swing is available
 		}
 		catch(ClassNotFoundException e) //if a Swing class couldn't be loaded
 		{
 			isSwingAvailable=false;  //if caused an error, Swing isn't available
-//G***del			System.err.println(e);  //print the error
 		}
 		try //try to create a debug display object
 		{
@@ -334,15 +247,6 @@ public class Debug
 	{
 		return object==null ? "null" : "not null";	//return whether this object is null
 	}
-
-	/**@return A string representation of the object, or "null" if the object is
-		<code>null</code>.*/
-/*G***del if not needed
-	public static String getNonNullString(final Object object)
-	{
-		return object!=null ? object.toString() : "null";	//return the object as a string, or "null" if the object is null
-	}
-*/
 
 	/**Returns the single debug object after creating it if necessary.
 	@return The singleton debug object.
@@ -390,8 +294,6 @@ public class Debug
 	public static boolean isVisible()
 	{
 		return getDebug().debugDisplay!=null && getDebug().debugDisplay.isEnabled();	//if we have a displayer, and it's enabled, we're showing output on the screen
-//G***del		return getDebug().debugDisplay!=null;	//if we have a displayer, we're showing output on the screen
-//G***del		return getDebug().debugFrame!=null;	//if we have a debug frame, we're showing output on the screen
 	}
 
 	/**@return Whether or not the Swing classes are available.*/
@@ -417,23 +319,6 @@ public class Debug
 					if(!isVisible())	//if we're not already visible
 					{
 						debug.debugDisplay.setEnabled(true);  //enable the debug display
-/*G***del when works
-						if(isSwingAvailable())  //if Swing is available
-						{
-							final Class swingDisplayClass=Class.forName(DEBUGSWINGDISPLAY_CLASS_NAME); //load the Swing debug display class
-							debug.debugDisplay=(DebugDisplay)swingDisplayClass.newInstance(); //create the display class
-						}
-						else  //if Swing isn't available, we'll use the AWT
-						{
-							final Class awtDisplayClass=Class.forName(DEBUGAWTDISPLAY_CLASS_NAME); //load the AWT debug display class
-							debug.debugDisplay=(DebugDisplay)awtDisplayClass.newInstance(); //create the display class
-						}
-						debug.debugDisplay.setEnabled(true);  //enable the debug display
-					}
-					catch(ClassNotFoundException e) {} //if we can't load a class, ignore the error; debug display will not have been turned on
-					catch(IllegalAccessException e) {} //if we can't access the display class constructor, ignore the error; debug display will not have been turned on
-					catch(InstantiationException e) {} //if we can't create the display object, ignore the error; debug display will not have been turned on
-*/
 					}
 				}
 				else	//if they want to turn visible debugging off
@@ -441,7 +326,6 @@ public class Debug
 					if(isVisible())	//if we're visible now
 					{
 						debug.debugDisplay.setEnabled(false);  //disable the debug display
-//G***del when works						debug.debugDisplay=null; //remove our reference to the debug display
 					}
 				}
 			}
@@ -592,44 +476,7 @@ public class Debug
 		if(isVisible() && isSwingAvailable())	//if visible debugging is turned on
 		{
 			getDebug().debugDisplay.trace(text);  //trace the text using the display
-/*G***del
-	//G***del		  debugTextArea.append(text+'\n');	//append this text to the debug text area, along with a line break
-		  if(USE_SWING) //if we are using Swing
-			{
-				try
-				{
-					jTextAreaAppendMethod.invoke(debugTextArea, new Object[]{text+'\n'}); //call debugTextArea.append()
-				}
-				catch(IllegalAccessException e) {}  //ignore any errors
-				catch(InvocationTargetException e) {}
-			}
-			else  //if we're not using Swing
-				debugTextArea.append(text+'\n');  //append this text to the debug text area, along with a line break G***create this text somewhere else
-*/
 		}
-	}
-
-	/**Outputs information regarding program execution location if debugging is
-		enabled.
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void trace()
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-			write(null);	//write trace information without a message
-	}
-
-	/**Outputs a message to the debug output if debugging is enabled.
-	Meant for messages that show the path of program execution.
-	@param traceString The string to output.
-	@see #getDebug
-	@see #isDebug
-	*/
-	public static void trace(final String traceString)
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-			write(traceString);	//write the string
 	}
 
 	/**Outputs a stack trace of the given error or exception object.
@@ -647,23 +494,34 @@ public class Debug
 		traceStack(throwable);  //trace the throwable object
 	}
 
-	/**Outputs a message and an object to the standard output if debugging is enabled.
+	/**Outputs a series of objects to the standard output if debugging is enabled.
 		Meant for messages that show the path of program execution.
-		The object is converted to a string and sent to the debug trace output on
-		the same line. This method is preferred to the one-argument version of
-		<code>trace()</code> if an object's value is being displayed, because
-		<code>Object.toString()</code> will only be called and
-		the strings concatenated if debugging is enabled.
-		<p>If the object is <code>null</code>, "null" will be output.</p>
-	@param traceString The string to output.
-	@param traceObject The object to output after the trace string.
+		The objects are converted to a string and sent to the debug trace output on
+		the same line.
+	<p>If no objects are provided, only the trace location will be output.</p>
+	<p>If an object is <code>null</code>, "null" will be output.</p>
+	@param objects The objects to output.
 	@see #getDebug
 	@see #isDebug
 	*/
-	public static void trace(final String traceString, final Object traceObject)
+	public static void trace(final Object... objects)
 	{
 		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-			write(traceString+(traceObject!=null ? traceObject : null));	//convert the object to a string, concatenate the strings, and trace the result G***use a constant here
+		{
+			if(objects.length>0)	//if there are objects to output
+			{
+				final StringBuilder stringBuilder=new StringBuilder();	//we'll create the string manually
+				for(final Object object:objects)	//for each object
+				{
+					stringBuilder.append(object).append(' ');	//append this object's string value with a separator
+				}
+				write(stringBuilder.toString());	//output string string we constructed
+			}
+			else	//if there are no objects
+			{
+				write(null);	//write trace information without a message			
+			}
+		}
 	}
 
 	/**Outputs an integer to the standard output if debugging is enabled.
@@ -714,49 +572,6 @@ public class Debug
 			write(MessageFormat.format(pattern, arguments));	//format the string and trace the result
 	}
 
-	/**Outputs a message to the standard output if debugging is enabled, with
-		identification of the tracing object.
-	Meant for messages that show the path of program execution.
-	@param sourceObject The object sending the trace.
-	@param traceString The string to output.
-	@see #getDebug
-	@see #isDebug
-	*/
-//G***eventually remove this method	when the calling object is discovered automatically
-/*G***del
-	public static void trace(final Object sourceObject, final String traceString)
-	{
-		if(isDebug())	//if debugging is turned on
-		{
-			if(sourceObject!=null)  //if a valid source object was given
-				trace("("+sourceObject.getClass().getName()+") "+traceString);  //add the object name to the trace string
-			else  //if a valid source object was not given
-				trace(traceString); //trace the string normally
-		}
-	}
-*/
-
-	/**Outputs an integer to the standard output if debugging is enabled, with
-		identification of the tracing object.
-	Meant for messages that show the path of program execution.
-	@param sourceObject The object sending the trace.
-	@param traceInt The integer to output.
-	@see #getDebug
-	@see #isDebug
-	*/
-/*G***del
-	public static void trace(final Object sourceObject, final int traceInt)
-	{
-		if(isDebug())	//if debugging is turned on
-		{
-			if(sourceObject!=null)  //if a valid source object was given
-				trace("("+sourceObject.getClass().getName()+") "+traceInt);  //add the object name before the integer
-			else  //if a valid source object was not given
-				trace(traceInt); //trace the integer normally
-		}
-	}
-*/
-
 	/**Outputs the stack trace to the standard output if debugging is enabled.
 		This represents informational data, not an error condition.
 	@see #getDebug
@@ -773,16 +588,23 @@ public class Debug
 	/**Outputs the stack trace to the standard output if debugging is enabled,
 		after outputting the specified trace text.
 		This represents informational data, not an error condition.
-	@param traceText The message to display along with the stack trace.
+		The objects are converted to a string and sent to the debug trace output on
+		the same line.
+	<p>If no objects are provided, only the trace stack will be output.</p>
+	<p>If an object is <code>null</code>, "null" will be output.</p>
+	@param objects The objects to output.
 	@see #getDebug
 	@see #isDebug
 	*/
-	public static void traceStack(final String traceText)
+	public static void traceStack(final Object... objects)
 	{
 		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
 		{
-			trace(traceText);	//output the provided text
-			traceStack(); //print a stack trace G***testing
+			if(objects.length>0)	//if objects were given
+			{
+				trace(objects);	//output the provided objects
+			}
+			traceStack(); //print a stack trace
 		}
 	}
 
@@ -800,7 +622,6 @@ public class Debug
 			trace(getStackTrace(throwable));	//send the text from a stack strace of the object as debug trace output
 		}
 	}
-
 
 	/**Prints a warning message if debugging is turned on.
 	Meant for errors that should not prevent the robust functioning of the program
@@ -856,22 +677,11 @@ public class Debug
 		{
 			//G***why not just call stackTrace()?
 			traceStack(throwable);  //trace the stack
-/**G***del when works
-			final StringWriter stringWriter=new StringWriter();	//create a string writer that we can write to
-			final PrintWriter stringPrintWriter=new PrintWriter(stringWriter);	//create a new print writer so that the stack trace can write to the string writer
-	//G***del System.out.println("printing stack trace");
-			throwable.printStackTrace(stringPrintWriter);	//print a stack trace of the error to the writer
-	//G***del System.out.println("ready to trace");
-			//G***check for isDebug() here, perhaps, and send something to System.err if not
-			trace(stringWriter.toString());	//send the text from the stack strace as debug trace output
-	//G***del System.out.println("ready to report error string");
-*/
 			error(throwable.toString());	//do the default handling of the error
 		}
 		else  //if we aren't debugging
 		{
 			throwable.printStackTrace(System.err);  //send a stack trace to the standard error output
-//G***del			System.err.println(throwable.toString());  //send the error to the standard error output
 		}
 	}
 
@@ -989,14 +799,8 @@ public class Debug
 	public String getProgramLocation()
 	{
 		final String stackTrace=getStackTrace(); //get a stack trace at the current location
-/*G***del when works
-		final StringWriter stringWriter=new StringWriter();	//create a string writer that we can write to
-		final PrintWriter stringPrintWriter=new PrintWriter(stringWriter);	//create a new print writer so that the stack trace can write to the string writer
-		new Throwable().printStackTrace(stringPrintWriter);	//print the stack trace to the string writer
-*/
 		//create a string tokenizer to read the contents of the stack trace line by line
 		final StringTokenizer stringTokenizer=new StringTokenizer(stackTrace, "\r\n"); //G***maybe use a constant here
-//G***del when works		final StringTokenizer stringTokenizer=new StringTokenizer(stringWriter.toString(), "\r\n"); //G***maybe use a constant here
 		while(stringTokenizer.hasMoreTokens())  //while there are more tokens
 		{
 			final String location=stringTokenizer.nextToken();  //get the next token, which should be a line of program execution
