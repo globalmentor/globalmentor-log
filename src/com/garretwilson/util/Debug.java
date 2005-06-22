@@ -48,6 +48,8 @@ public class Debug
 	{
 		/**Indicates the program's execution path.*/
 		TRACE,
+		/**Indicates useful information that should nonetheless not be logged.*/
+		INFO,
 		/**Specific information which should be logged but which are adversity-neutral.*/
 		LOG,
 		/**Indications that conditions are possibly adverse.*/
@@ -57,13 +59,13 @@ public class Debug
 	}; 
 	
 	/**Indicates all reporting levels.*/
-	public final static EnumSet<ReportLevel> ALL_REPORT_LEVELS=EnumSet.of(ReportLevel.TRACE, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
+	public final static EnumSet<ReportLevel> ALL_REPORT_LEVELS=EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
 
 	/**The levels that should notify the user.*/
 //G***del	private int notifyLevel=ERROR_LEVEL;
 
 	/**The levels that should be reported.*/
-	private EnumSet<ReportLevel> reportLevels=EnumSet.of(ReportLevel.TRACE, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
+	private EnumSet<ReportLevel> reportLevels=EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
 
 	/**The available reporting options.*/
 	public enum ReportOption
@@ -592,6 +594,21 @@ public class Debug
 		}
 	}
 */
+
+	/**Outputs a series of objects to the standard output if debugging is enabled.
+	Meant for useful information that should not be logged.
+	<p>If no objects are provided, only the trace location will be output.</p>
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
+		a stack trace will be generated.
+	@see ReportLevel#INFO
+	*/
+	public static void info(final Object... objects)
+	{
+		if(isDebug() && getReportLevels().contains(ReportLevel.INFO))	//if information reporting is enabled
+		{
+			write(ReportLevel.INFO, objects);	//write the information
+		}
+	}
 
 	/**Outputs a series of objects to the standard output if debugging is enabled.
 	Meant for specific information which should be logged but which are adversity-neutral.
