@@ -12,7 +12,9 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.StringTokenizer;
+import static com.garretwilson.util.SetUtilities.*;
 
 /**Singleton class which encapsulates debugging functionality.
 @author Garret Wilson
@@ -59,13 +61,13 @@ public class Debug
 	}; 
 	
 	/**Indicates all reporting levels.*/
-	public final static EnumSet<ReportLevel> ALL_REPORT_LEVELS=EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
+	public final static Set<ReportLevel> ALL_REPORT_LEVELS=createEnumSet(ReportLevel.class, ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
 
 	/**The levels that should notify the user.*/
 //G***del	private int notifyLevel=ERROR_LEVEL;
 
 	/**The levels that should be reported.*/
-	private EnumSet<ReportLevel> reportLevels=EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
+	private Set<ReportLevel> reportLevels=createEnumSet(ReportLevel.class, ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
 
 	/**The available reporting options.*/
 	public enum ReportOption
@@ -84,7 +86,7 @@ public class Debug
 //G***del	public final static long REPORT_ALL=REPORT_LEVEL|REPORT_TIME|REPORT_THREAD|REPORT_LOCATION;
 
 	/**The information that should be reported with each log.*/
-	private EnumSet<ReportOption> reportOptions=EnumSet.of(ReportOption.LEVEL, ReportOption.TIME, ReportOption.THREAD, ReportOption.LOCATION);
+	private Set<ReportOption> reportOptions=createEnumSet(ReportOption.class, ReportOption.LEVEL, ReportOption.TIME, ReportOption.THREAD, ReportOption.LOCATION);
 
 	/**The stream used to output debug messages. This stream is also used as the
 		output stream if a debuf file is specified.
@@ -325,7 +327,7 @@ public class Debug
 	Defaults to all report options.
 	@return The debug information that will be reported with each log.
 	*/
-	public static EnumSet<ReportOption> getReportOptions()
+	public static Set<ReportOption> getReportOptions()
 	{
 		return getDebug().reportOptions; //return the report options
 	}
@@ -333,7 +335,7 @@ public class Debug
 	/**Sets the type of information that should be reported with each log.
 	@param options The information to be reported on.
 	*/
-	public static void setReportOptions(final EnumSet<ReportOption> options)
+	public static void setReportOptions(final Set<ReportOption> options)
 	{
 		getDebug().reportOptions=options;  //update the report options
 	}
@@ -367,7 +369,7 @@ public class Debug
 	Defaults to all available levels.
 	@return The log levels that will be logged.
 	*/
-	public static EnumSet<ReportLevel> getReportLevels()
+	public static Set<ReportLevel> getReportLevels()
 	{
 		return getDebug().reportLevels; //return the report levels
 	}
@@ -375,19 +377,19 @@ public class Debug
 	/**Sets the report levels that will actually be logged.
 	@param levels The levels that will be logged.
 	*/
-	public static void setReportLevels(final EnumSet<ReportLevel> levels)
+	public static void setReportLevels(final Set<ReportLevel> levels)
 	{
 		getDebug().reportLevels=levels;  //update the report levels
 	}
 
 	/**Sets the minimum report levels that will actually be logged.
 	@param minimumLevel The minimum level that will be logged.
-	@see #setReportLevel(EnumSet<ReportLevel>)
+	@see #setReportLevels(Set)
 	*/
 	public static void setMinimumReportLevel(final ReportLevel minimumLevel)
 	{
 		final int minimumOrdinal=minimumLevel.ordinal();	//get the ordinal of the minimum level
-		final EnumSet<ReportLevel> levels=EnumSet.of(minimumLevel);	//create a set with the minimum level
+		final Set<ReportLevel> levels=createEnumSet(ReportLevel.class, minimumLevel);	//create a set with the minimum level
 		for(final ReportLevel level:ReportLevel.values())	//for all available report levels
 		{
 			if(level.ordinal()>minimumOrdinal)	//if this level is higher than the minimum
@@ -449,8 +451,6 @@ public class Debug
 	/**Writes a debug message to all previously specified locations, such as
 		to the standard output, to the visible log, to disk, etc.
 	@param level The reporting level of the log entry.
-	@param stack The stack trace, or <code>null</code> if no stack trace is requested.
-		Trace information from this class will not be included.
 	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
 		a stack trace will be generated.
 	@see #isVisible
@@ -459,7 +459,7 @@ public class Debug
 	private static void write(final ReportLevel level, final Object... objects)
 	{
 		final Debug debug=getDebug();	//get the debug object
-		final EnumSet<ReportOption> options=debug.reportOptions;  //get the items we should report
+		final Set<ReportOption> options=debug.reportOptions;  //get the items we should report
 			//construct a string with time level : [thread] location : objects
 		final StringBuffer stringBuffer=new StringBuffer();  //create a string builder for constructing our log output
 //G***fix		if((report&REPORT_LEVEL)!=0)  //if we should report the log level
