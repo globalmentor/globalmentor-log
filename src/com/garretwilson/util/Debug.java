@@ -552,7 +552,8 @@ public class Debug
 	{
 		if(isDebug() && getReportLevels().contains(ReportLevel.TRACE))	//if tracing is enabled
 		{
-			write(ReportLevel.TRACE, new Throwable(), objects);	//write the trace information
+			write(ReportLevel.TRACE, objects);	//write the trace information
+			write(ReportLevel.TRACE, new Throwable());	//write a stack trace information
 		}
 	}
 
