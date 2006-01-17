@@ -1,19 +1,8 @@
 package com.garretwilson.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 import static com.garretwilson.util.SetUtilities.*;
 
 /**Singleton class which encapsulates debugging functionality.
@@ -207,7 +196,8 @@ public class Debug
 	}
 	
 	/**An object for formatting the date and time.*/
-	protected DateFormat dateFormat=DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+//TODO del	protected final DateFormat dateFormat=DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+	protected final DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
 
 	/**The default constructor, which isn't allowed to be called by external functions.
 	@see #getDebug
