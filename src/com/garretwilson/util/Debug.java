@@ -3,6 +3,9 @@ package com.garretwilson.util;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+
+import com.garretwilson.lang.ObjectUtilities;
+
 import static com.garretwilson.util.SetUtilities.*;
 
 /**Singleton class which encapsulates debugging functionality.
@@ -142,8 +145,8 @@ public class Debug
 	}
 
 	/**Redirects debug output to a specific file when debug is turned on.
-	@param file The file in which debug information should be stored, or
-		<code>null</code> to revert back to the standard output.
+	If the file isn't changing no action occurs.
+	@param file The file in which debug information should be stored, or <code>null</code> to revert back to the standard output.
 	@exception FileNotFoundException Thrown if the specified file is not found
 	@see #isDebug
 	@see #setOutput(java.io.PrintStream)
@@ -151,14 +154,17 @@ public class Debug
 	public static synchronized void setOutput(final File file) throws FileNotFoundException
 	{
 		final Debug debug=getDebug();	//get debug support
-		if(debug.debugFile!=null)	//if they had a file open already
+		if(!ObjectUtilities.equals(debug.debugFile, file))	//if the file is really changing
 		{
-			debug.debugPrintStream.close();	//close the stream to the existing file
-		}
-		debug.debugFile=file;	//show which file we'll use for debugging
-		if(isDebug())	//if debugging is turned on
-		{
-			debug.updateOutput();	//update our output
+			if(debug.debugFile!=null)	//if they had a file open already
+			{
+				debug.debugPrintStream.close();	//close the stream to the existing file
+			}
+			debug.debugFile=file;	//show which file we'll use for debugging
+			if(isDebug())	//if debugging is turned on
+			{
+				debug.updateOutput();	//update our output
+			}
 		}
 	}
 
