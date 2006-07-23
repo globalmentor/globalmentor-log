@@ -4,9 +4,9 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import static java.util.Collections.*;
 
-import static com.garretwilson.util.SetUtilities.*;
+import com.garretwilson.lang.ObjectUtilities;
 
 /**Singleton class which encapsulates debugging functionality.
 @author Garret Wilson
@@ -53,13 +53,13 @@ public class Debug
 	}; 
 	
 	/**Indicates all reporting levels.*/
-	public final static Set<ReportLevel> ALL_REPORT_LEVELS=createEnumSet(ReportLevel.class, ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
+	public final static Set<ReportLevel> ALL_REPORT_LEVELS=unmodifiableSet(EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR));
 
 	/**The levels that should notify the user.*/
 //G***del	private int notifyLevel=ERROR_LEVEL;
 
 	/**The levels that should be reported.*/
-	private Set<ReportLevel> reportLevels=createEnumSet(ReportLevel.class, ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR);
+	private Set<ReportLevel> reportLevels=unmodifiableSet(EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR));
 
 	/**The available reporting options.*/
 	public enum ReportOption
@@ -78,7 +78,7 @@ public class Debug
 //G***del	public final static long REPORT_ALL=REPORT_LEVEL|REPORT_TIME|REPORT_THREAD|REPORT_LOCATION;
 
 	/**The information that should be reported with each log.*/
-	private Set<ReportOption> reportOptions=createEnumSet(ReportOption.class, ReportOption.LEVEL, ReportOption.TIME, ReportOption.THREAD, ReportOption.LOCATION);
+	private Set<ReportOption> reportOptions=unmodifiableSet(EnumSet.of(ReportOption.LEVEL, ReportOption.TIME, ReportOption.THREAD, ReportOption.LOCATION));
 
 	/**The stream used to output debug messages. This stream is also used as the
 		output stream if a debuf file is specified.
@@ -385,7 +385,7 @@ public class Debug
 	public static void setMinimumReportLevel(final ReportLevel minimumLevel)
 	{
 		final int minimumOrdinal=minimumLevel.ordinal();	//get the ordinal of the minimum level
-		final Set<ReportLevel> levels=createEnumSet(ReportLevel.class, minimumLevel);	//create a set with the minimum level
+		final Set<ReportLevel> levels=EnumSet.of(minimumLevel);	//create a set with the minimum level
 		for(final ReportLevel level:ReportLevel.values())	//for all available report levels
 		{
 			if(level.ordinal()>minimumOrdinal)	//if this level is higher than the minimum
