@@ -3,27 +3,42 @@ package com.garretwilson.util;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import static java.util.Collections.*;
 
+import com.garretwilson.io.AsynchronousWriter;
+import com.garretwilson.io.WriterPrintStream;
 import com.garretwilson.lang.ObjectUtilities;
 
-/**Singleton class which encapsulates debugging functionality.
+import static com.garretwilson.lang.SystemUtilities.*;
+import com.garretwilson.text.W3CDateFormat;
+
+/**Singleton class that encapsulates debugging functionality.
+The singleton instance is created when the class is loaded.
 @author Garret Wilson
 */
 public class Debug
 {
 
-//G***del	private final static boolean USE_SWING=false; //G***fix
-
-	/**The single copy of the debug class that's allowed to be created.*/
-	private static Debug debug=null;
-
 	/**Whether or not debugging is turned on.*/
-	private boolean isDebug=false;
+	private static boolean isDebug=false;
 
-	/**Whether or not Swing is available.*/
-	private boolean isSwingAvailable=false;
+		/**@return Whether or not debugging is turned on.*/
+		public static boolean isDebug() {return isDebug;}
+
+		/**Sets whether debugging is turned on.
+		@param newDebug Whether debugging should be turned on.
+		@exception IOException if when turning debug on or off there is an I/O error updating the debug output.
+		*/
+		public static synchronized void setDebug(final boolean newDebug) throws IOException
+		{
+			if(isDebug!=newDebug)	//if the debug status is really changing
+			{
+				isDebug=newDebug;	//update the debug variable
+				updateOutput();	//update our output to coincide with our new debug status
+			}
+		}
 
 	/**The name of the JFrame class.*/
 	private final static String JFRAME_CLASS_NAME="javax.swing.JFrame";
@@ -34,8 +49,84 @@ public class Debug
 	/**The name of the DebugSwingDisplay class.*/
 	private final static String DEBUGSWINGDISPLAY_CLASS_NAME="com.garretwilson.swing.DebugSwingDisplay";
 
-	/**The class used for displaying information in a graphical user interface.*/
-	private DebugDisplay debugDisplay=null;
+	/**The lock for allowing lazy creation and access of the debug display.*/
+	private final static Lock debugDisplayLock=new ReentrantLock();
+	
+	/**The lazily-initialized class used for displaying information in a graphical user interface.*/
+	private static DebugDisplay debugDisplay=null;
+
+		/**Returns the class used for displaying information in a graphical user interface.
+		This method is thread safe; its synchronization overhead is probably negligible compared to the overhead used in actually writing to the debug display, which is synchronized.
+		@return The lazily-initialized class used for displaying information in a graphical user interface.
+		*/
+		protected static DebugDisplay getDebugDisplay()
+		{
+			debugDisplayLock.lock();	//acquire the debug display lock
+			try
+			{
+				if(debugDisplay==null)	//if there is no debug display
+				{
+					try
+					{
+						try	//see which debug class we can load
+						{
+							Class.forName(JFRAME_CLASS_NAME); //load the JFrame class, if we can; if so, we have Swing available
+							final Class swingDisplayClass=Class.forName(DEBUGSWINGDISPLAY_CLASS_NAME); //load the Swing debug display class
+							debugDisplay=(DebugDisplay)swingDisplayClass.newInstance(); //create the display class
+						}
+						catch(final ClassNotFoundException swingClassNotFoundException) //if a Swing class couldn't be loaded
+						{
+							final Class awtDisplayClass=Class.forName(DEBUGAWTDISPLAY_CLASS_NAME); //load the AWT debug display class
+							debugDisplay=(DebugDisplay)awtDisplayClass.newInstance(); //create the display class
+						}
+					}
+					catch(final ClassNotFoundException classNotFoundException)	//if we can't load a class
+					{
+						throw new AssertionError(classNotFoundException);
+					}
+					catch(final IllegalAccessException illegalAccessException)	//if we can't access the display class constructor
+					{
+						throw new AssertionError(illegalAccessException);
+					}
+					catch(final InstantiationException instantiationException)	//if we can't create the display object					
+					{
+						throw new AssertionError(instantiationException);
+					}
+				}
+			}
+			finally
+			{
+				debugDisplayLock.unlock();	//always release the debug lock
+			}
+			return debugDisplay;	//return our debug display
+		}
+
+	/**Whether debugging is visible on the screen; this variable is only updated under synchronization of the debug display, so it is guaranteed to be in synch with the debug display setting.*/
+	private static boolean visible=false;
+
+		/**@return Whether or not debugging is visible on the screen, independent of whether debug is turned on.*/
+		public static boolean isVisible() {return visible;}
+
+		/**Sets whether debugging output is shown in a separate log window. Has no effect if debugging is not turned on.
+		This implementation changes the visible setting synchronizing on the debug display so that it's value will be in synch with the setting of the debug display.
+		@param visible Whether debugging should be displayed visibly.
+		@see #getDebugDisplay()
+		*/
+		public static void setVisible(final boolean visible)
+		{
+			final DebugDisplay debugDisplay=getDebugDisplay();	//get the debug display
+			synchronized(debugDisplay)	//keep the debug display setting and the visibility variable in synch
+			{
+				debugDisplay.setEnabled(visible);	//enable or disable the debug display
+				Debug.visible=visible;	//update the local variable to match
+			}
+		}
+
+	/**An object for formatting the date and time. This object is not thread safe and must be synchronized externally; in this implementation it is synchronized on itself.*/
+	protected static final DateFormat dateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE_TIME);
+
+	/**The system line separator characters in use when the class is created.*/
+	private final static String LINE_SEPARATOR=getLineSeparator();
 
 	/**The available debug reporting levels.*/
 	public enum ReportLevel
@@ -51,15 +142,20 @@ public class Debug
 		/**Indicates an unexpected condition representing an error.*/
 		ERROR
 	}; 
-	
-	/**Indicates all reporting levels.*/
-	public final static Set<ReportLevel> ALL_REPORT_LEVELS=unmodifiableSet(EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR));
-
-	/**The levels that should notify the user.*/
-//G***del	private int notifyLevel=ERROR_LEVEL;
 
 	/**The levels that should be reported.*/
-	private Set<ReportLevel> reportLevels=unmodifiableSet(EnumSet.of(ReportLevel.TRACE, ReportLevel.INFO, ReportLevel.LOG, ReportLevel.WARN, ReportLevel.ERROR));
+	private static Set<ReportLevel> reportLevels=unmodifiableSet(EnumSet.allOf(ReportLevel.class));
+
+		/**Returns the report levels which should actually be logged.
+		Defaults to all available levels.
+		@return The log levels that will be logged.
+		*/
+		public static Set<ReportLevel> getReportLevels() {return reportLevels;}
+	
+		/**Sets the report levels that will actually be logged.
+		@param levels The levels that will be logged.
+		*/
+		public static void setReportLevels(final Set<ReportLevel> levels) {reportLevels=levels;}
 
 	/**The available reporting options.*/
 	public enum ReportOption
@@ -74,30 +170,34 @@ public class Debug
 		LOCATION
 	}
 
-	/**Indicates that all information should be reported.*/
-//G***del	public final static long REPORT_ALL=REPORT_LEVEL|REPORT_TIME|REPORT_THREAD|REPORT_LOCATION;
-
 	/**The information that should be reported with each log.*/
-	private Set<ReportOption> reportOptions=unmodifiableSet(EnumSet.of(ReportOption.LEVEL, ReportOption.TIME, ReportOption.THREAD, ReportOption.LOCATION));
+	private static Set<ReportOption> reportOptions=unmodifiableSet(EnumSet.allOf(ReportOption.class));
 
-	/**The stream used to output debug messages. This stream is also used as the
-		output stream if a debuf file is specified.
+		/**Returns the debug information reported.
+		Defaults to all report options.
+		@return The debug information that will be reported with each log.
+		*/
+		public static Set<ReportOption> getReportOptions() {return reportOptions;}
+	
+		/**Sets the type of information that should be reported with each log.
+		@param options The information to be reported on.
+		*/
+		public static void setReportOptions(final Set<ReportOption> options) {reportOptions=options;}
+
+	/**The writer used to output debug messages. This stream is also used as the output stream if a debug file is specified.
+	This defaults to a writer to {@link System#out} using the system default character encoding, because the system out stream expects the current encoding.
 	@see #setOutput(java.io.File)
 	@see #setOutput(java.io.PrintStream)
-	@see System#out
 	*/
-	private PrintStream debugPrintStream=System.out;
+	private static Writer debugWriter=new AsynchronousWriter(new OutputStreamWriter(System.out));
 
-	/**The file being used for debug output, or <code>null</code> if no file is
-		being used.
+	/**The file being used for debug output, or <code>null</code> if no file is being used.
 	@see #setOutput(java.io.PrintStream)
 	*/
-	private File debugFile=null;
+	private static File debugFile=null;
 
-	/**Sets the error output of the application. If any error occur, they are
-		reported to the standard error output.
-	@param errorPrintStream The new stream to use for error output; can be
-		<code>System.err</code> for the default system error output.
+	/**Sets the error output of the application. If any error occur, they are reported to the standard error output.
+	@param errorPrintStream The new stream to use for error output; can be <code>System.err</code> for the default system error output.
 	*/
 	public static void setErr(final PrintStream errorPrintStream)
 	{
@@ -111,231 +211,92 @@ public class Debug
 		}
 	}
 
-	/**@return The print stream used to output debug messages.*/
-	public static PrintStream getOutput()
+	/**@return The writer used to output debug messages.*/
+	public static Writer getOutput()
 	{
-		return getDebug().debugPrintStream;	//return the debug print stream
+		return debugWriter;	//return the debug writer
 	}
 
 	/**Sets the stream used to output debug messages when debug is turned on.
-		The default before this function is called is <code>System.out</code>.
-	@param printStream The print stream to use to print debug messages.
-	@see #isDebug
+	The default before this function is called is a writer to {@link System#out}.
+	@param writer The writer to use to print debug messages.
+	@exception IOException if there is an I/O error updating the debug output.
+	@see #isDebug()
 	@see #setOutput(java.io.File)
 	*/
-	public static synchronized void setOutput(final PrintStream printStream)
+	public static synchronized void setOutput(final Writer writer) throws IOException
 	{
-		final Debug debug=getDebug();	//get debug support
-		debug.debugPrintStream=printStream;	//save the print stream they pass
-		if(isDebug())	//if debugging is turned on
-		{
-			debug.updateOutput();	//update our output
-		}
+		debugWriter=writer;	//save the writer they pass
+		updateOutput();	//update our output
 	}
 
-	/**@return The output file if debugging is turned on and debug output has been
-		redirected to a file, or <code>null</code> if there is no file assigned or
-		debugging is turned off.
-	@see #isDebug
+	/**@return The output file if debugging is turned on and debug output has been redirected to a file, or <code>null</code> if there is no file assigned or debugging is turned off.
+	@see #isDebug()
 	@see #setOutput(java.io.File)
 	*/
 	public static synchronized File getOutputFile()
 	{
-		return isDebug() ? getDebug().debugFile : null;	//return the file if we're debugging, null if not
+		return isDebug() ? debugFile : null;	//return the file if we're debugging, null if not
 	}
 
 	/**Redirects debug output to a specific file when debug is turned on.
 	If the file isn't changing no action occurs.
 	@param file The file in which debug information should be stored, or <code>null</code> to revert back to the standard output.
-	@exception FileNotFoundException Thrown if the specified file is not found
-	@see #isDebug
+	@exception IOException if there is an I/O exception closing the current writer.
+	@exception FileNotFoundException if the specified file is not found.
+	@see #isDebug()
 	@see #setOutput(java.io.PrintStream)
 	*/
-	public static synchronized void setOutput(final File file) throws FileNotFoundException
+	public static synchronized void setOutput(final File file) throws IOException, FileNotFoundException
 	{
-		final Debug debug=getDebug();	//get debug support
-		if(!ObjectUtilities.equals(debug.debugFile, file))	//if the file is really changing
+		if(!ObjectUtilities.equals(debugFile, file))	//if the file is really changing
 		{
-			if(debug.debugFile!=null)	//if they had a file open already
+			if(debugFile!=null)	//if they had a file open already
 			{
-				debug.debugPrintStream.close();	//close the stream to the existing file
+				debugWriter.close();	//close the stream to the existing file
 			}
-			debug.debugFile=file;	//show which file we'll use for debugging
+			debugFile=file;	//show which file we'll use for debugging
 			if(isDebug())	//if debugging is turned on
 			{
-				debug.updateOutput();	//update our output
+				updateOutput();	//update our output
 			}
 		}
 	}
 
 	
-	/**Updates the debug output, based upon whether debug is turned on or off.*/
-	protected void updateOutput()
+	/**Updates the debug output, based upon whether debug is turned on or off.
+	@exception IOException if there is an I/O error updating the debug output.
+	*/
+	protected static synchronized void updateOutput() throws IOException
 	{
-		if(isDebug)	//if debugging is turned on
+		if(isDebug())	//if debugging is turned on
 		{
 			if(debugFile!=null)	//if we have a debug file
 			{
 				try
 				{
-					debugPrintStream=new PrintStream(new FileOutputStream(debugFile, true));	//open an output stream for appending to the file (open this first so that any error will not affect our current status)
+					debugWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(debugFile, true))));	//open an asynchronous, buffered writer for appending to the file (open this first so that any error will not affect our current status)
 				}
 				catch(final FileNotFoundException fileNotFoundException)	//if we can't open an output stream to the file
 				{
 					System.err.println(fileNotFoundException);	//indicate an error TODO send this to the existing error stream, if we can
 				}
 			}
-			if(debugPrintStream!=null)	//if a debug print stream is given
+			if(debugWriter!=null)	//if a debug print stream is given
 			{
-				setErr(debugPrintStream);	//redirect the error output to let all errors go to the debug output as well
+				setErr(new WriterPrintStream(debugWriter));	//redirect the error output to let all errors go to the debug output as well; wrap the writer we already have (which is thread safe itself) with a print stream adapter (which is also thread safe)
 			}
 		}
 		else	//if debug is turned off
 		{
 			if(debugFile!=null)	//if we have a debug file
 			{
-				debugPrintStream.close();	//close the debug output stream
+				debugWriter.close();	//close the debug output stream
 			}
-//G***del; this would result in infinite recursion, and isn't necessary, anyway			setOutput(System.out);	//redirect all debugging output back to the standard output
 			setErr(System.err);	//set error output back to its default
 		}
 	}
 	
-	/**An object for formatting the date and time.*/
-//TODO del	protected final DateFormat dateFormat=DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-	protected final DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
-
-	/**The default constructor, which isn't allowed to be called by external functions.
-	@see #getDebug
-	*/
-  private Debug()
-	{
-		try
-		{
-			Class.forName(JFRAME_CLASS_NAME); //load the JFrame class, if we can
-			isSwingAvailable=true;  //if this didn't cause an error, we know that Swing is available
-		}
-		catch(ClassNotFoundException e) //if a Swing class couldn't be loaded
-		{
-			isSwingAvailable=false;  //if caused an error, Swing isn't available
-		}
-		try //try to create a debug display object
-		{
-			if(isSwingAvailable)  //if Swing is available
-			{
-				final Class swingDisplayClass=Class.forName(DEBUGSWINGDISPLAY_CLASS_NAME); //load the Swing debug display class
-				debugDisplay=(DebugDisplay)swingDisplayClass.newInstance(); //create the display class
-			}
-			else  //if Swing isn't available, we'll use the AWT
-			{
-				final Class awtDisplayClass=Class.forName(DEBUGAWTDISPLAY_CLASS_NAME); //load the AWT debug display class
-				debugDisplay=(DebugDisplay)awtDisplayClass.newInstance(); //create the display class
-			}
-		}
-		catch(ClassNotFoundException e) {} //if we can't load a class, ignore the error; debug display will not have been turned on G***fix comments here
-		catch(IllegalAccessException e) {} //if we can't access the display class constructor, ignore the error; debug display will not have been turned on
-		catch(InstantiationException e) {} //if we can't create the display object, ignore the error; debug display will not have been turned on
-	}
-
-	/**@param object The object for which a status should be returned.
-	@return "null" if the object is <code>null</code>, otherwise "not null".*/
-/*G***del
-	public static String getNullStatus(final Object object)
-	{
-		return object==null ? "null" : "not null";	//return whether this object is null
-	}
-*/
-
-	/**Returns the single debug object after creating it if necessary.
-	@return The singleton debug object.
-	*/
-	public static synchronized Debug getDebug()
-	{
-		if(debug==null)	//if there is no debug object, yet
-		{
-			debug=new Debug();	//create a new one
-		}
-		return debug;	//return the single debug object
-	}
-
-	/**@return Whether or not debugging is turned on.*/
-	public static boolean isDebug()
-	{
-		return debug!=null ? debug.isDebug : false;	//don't even bother creating a debug object if there isn't one---just report back that debugging isn't turned on
-	}
-
-	/**Sets whether debugging is turned on.
-	@param newDebug Whether debugging should be turned on.
-	*/
-	public static void setDebug(final boolean newDebug)
-	{
-		final Debug debug=getDebug();	//get the debug object
-		if(newDebug!=debug.isDebug)	//if they are really changing the debug status
-		{
-			debug.isDebug=newDebug;	//update the debug variable
-			debug.updateOutput();	//update our output to coincide with our new debug status
-		}
-	}
-
-	/**@return Whether or not debugging is visible on the screen.*/
-	public static boolean isVisible()
-	{
-		return isDebug() && getDebug().debugDisplay!=null && getDebug().debugDisplay.isEnabled();	//if we have a displayer, and it's enabled, we're showing output on the screen
-	}
-
-	/**@return Whether or not the Swing classes are available.*/
-	protected static boolean isSwingAvailable()
-	{
-		return getDebug().isSwingAvailable;	//see if swing is available
-	}
-
-	/**Sets whether debugging output is shown in a separate log window. Has no
-		effect if debugging is not turned on.
-	@param visible Whether debugging should be turned on.
-	@see #isDebug
-	*/
-	public static synchronized void setVisible(final boolean visible)
-	{
-		if(isDebug() && isSwingAvailable())	//if debugging is turned on, and Swing is present
-		{
-			final Debug debug=getDebug(); //get a reference to the debug object
-			if(debug.debugDisplay!=null)    //we can only become visible if we have a debug display object
-			{
-				if(visible)	//if they want to turn visible debugging on
-				{
-					if(!isVisible())	//if we're not already visible
-					{
-						debug.debugDisplay.setEnabled(true);  //enable the debug display
-					}
-				}
-				else	//if they want to turn visible debugging off
-				{
-					if(isVisible())	//if we're visible now
-					{
-						debug.debugDisplay.setEnabled(false);  //disable the debug display
-					}
-				}
-			}
-		}
-	}
-
-	/**Returns the debug information reported.
-	Defaults to all report options.
-	@return The debug information that will be reported with each log.
-	*/
-	public static Set<ReportOption> getReportOptions()
-	{
-		return getDebug().reportOptions; //return the report options
-	}
-
-	/**Sets the type of information that should be reported with each log.
-	@param options The information to be reported on.
-	*/
-	public static void setReportOptions(final Set<ReportOption> options)
-	{
-		getDebug().reportOptions=options;  //update the report options
-	}
-
 	/**Returns the report levels for which the user should by notified, which will
 		be one or more of the <code>_LEVEL</code> constants ORed together. The
 		default is <code>ERROR_LEVEL</code>.
@@ -361,23 +322,6 @@ public class Debug
 	}
 */
 
-	/**Returns the report levels which should actually be logged.
-	Defaults to all available levels.
-	@return The log levels that will be logged.
-	*/
-	public static Set<ReportLevel> getReportLevels()
-	{
-		return getDebug().reportLevels; //return the report levels
-	}
-
-	/**Sets the report levels that will actually be logged.
-	@param levels The levels that will be logged.
-	*/
-	public static void setReportLevels(final Set<ReportLevel> levels)
-	{
-		getDebug().reportLevels=levels;  //update the report levels
-	}
-
 	/**Sets the minimum report levels that will actually be logged.
 	@param minimumLevel The minimum level that will be logged.
 	@see #setReportLevels(Set)
@@ -396,52 +340,29 @@ public class Debug
 		setReportLevels(levels);	//set the report levels
 	}
 
-	/**@return The string representation of the stack trace at the current program location.*/
-/*G***del
-	public static String getStackTrace()
-	{
-		return getStackTrace(new Throwable());  //return the stack trace of a new throwable object
-	}
-*/
-
-	/**Gets a string representation of a stack trace of a given error or exception.
-	@param throwable The object which holds stack information.
-	@return The stack trace of the given object in string form.
+	/**Appends a stack trace to a string builder, including any recursive causes.
+	@param stringBuilder The string builder to retrieve the stack trace.
+	@param throwable The source of the stack trace, not including any source inside this class.
+	@return The string builder into which the stack trace was written.
 	*/
-/*G***del
-	public static String getStackTraceString(final Throwable throwable)
+	public static StringBuilder appendStackTrace(final StringBuilder stringBuilder, final Throwable throwable)
 	{
-		final StringWriter stringWriter=new StringWriter();	//create a string writer that we can write to
-		final PrintWriter stringPrintWriter=new PrintWriter(stringWriter);	//create a new print writer so that the stack trace can write to the string writer
-		throwable.printStackTrace(stringPrintWriter);	//print the stack trace to the string writer
-		return stringWriter.toString();	//return the constructed string containing the stack trace
-	}
-*/
-
-	/**Appends a stack trace to a string buffer, including any recursive causes.
-	@param stringBuffer The string buffer to retrieve the stack trace.
-	@param throwable The source of the stack trace, not including any
-		source inside this class.
-	@return The string buffer into which the stack trace was written.
-	*/
-	public static StringBuffer appendStackTrace(final StringBuffer stringBuffer, final Throwable throwable)
-	{
-		stringBuffer.append(throwable).append('\n');	//append the throwable itself
+		stringBuilder.append(throwable).append('\n');	//append the throwable itself
 		final StackTraceElement[] stack=throwable.getStackTrace();	//get the trace of the stack
 		for(final StackTraceElement stackTraceElement:stack)	//for each element on the stack
 		{
 			if(!Debug.class.getName().equals(stackTraceElement.getClassName()))	//if this location was not inside this class
 			{
-				stringBuffer.append('\t').append(stackTraceElement).append('\n');	//append the stack trace element
+				stringBuilder.append('\t').append(stackTraceElement).append('\n');	//append the stack trace element
 			}
 		}
 		final Throwable cause=throwable.getCause();	//get the cause of this throwable
 		if(cause!=null)	//if there is a cause
 		{
-			stringBuffer.append("Cause:");	//Cause:
-			appendStackTrace(stringBuffer, cause);	//recursively append the cause
+			stringBuilder.append("Cause:");	//Cause:
+			appendStackTrace(stringBuilder, cause);	//recursively append the cause
 		}
-		return stringBuffer;	//return the string buffer, now with the new information
+		return stringBuilder;	//return the string buffer, now with the new information
 	}
 
 	/**Writes a debug message to all previously specified locations, such as
@@ -449,76 +370,72 @@ public class Debug
 	@param level The reporting level of the log entry.
 	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
 		a stack trace will be generated.
-	@see #isVisible
-	@see #setVisible
+	@see #isVisible()
+	@see #setVisible(boolean)
 	*/
 	private static void write(final ReportLevel level, final Object... objects)
 	{
-		final Debug debug=getDebug();	//get the debug object
-		final Set<ReportOption> options=debug.reportOptions;  //get the items we should report
+		final Set<ReportOption> options=reportOptions;  //get the items we should report
 			//construct a string with time level : [thread] location : objects
-		final StringBuffer stringBuffer=new StringBuffer();  //create a string builder for constructing our log output
-//G***fix		if((report&REPORT_LEVEL)!=0)  //if we should report the log level
+		final StringBuilder stringBuilder=new StringBuilder();  //create a string builder for constructing our log output
 		if(options.contains(ReportOption.LEVEL))	//if we should report the report level
 		{
-			stringBuffer.append(level).append(' ').append(':');	//level:
+			stringBuilder.append(level).append(' ').append(':');	//level:
 		}
 		if(options.contains(ReportOption.TIME))  //if we should report the time
 		{
-		  stringBuffer.append(' ');  //append a space
-			debug.dateFormat.format(new Date(), stringBuffer, new FieldPosition(0)); //format the date into our string buffer
+		  stringBuilder.append(' ');  //append a space
+		  final Date now=new Date();	//get the current date and time
+		  final String dateTimeString;	//we'll format a date+time string separately, so as to narrow the number of operations we have to synchronize
+		  synchronized(dateFormat)	//ensure only one thread accesses the date format at a time, because the object is not thread-safe
+		  {
+		  	dateTimeString=dateFormat.format(now);	//format the current date and time
+		  }
+		  stringBuilder.append(dateTimeString);	//append the date+time string to the string builder
 		}
 		if(options.contains(ReportOption.THREAD))  //if we should report the thread
 		{
-		  stringBuffer.append(' ');  //append a space
-		  stringBuffer.append('[');  //append a left bracket
-			stringBuffer.append(Thread.currentThread().getName()); //append the thread name
-		  stringBuffer.append(']');  //append a right bracket
+		  stringBuilder.append(' ');  //append a space
+		  stringBuilder.append('[');  //append a left bracket
+			stringBuilder.append(Thread.currentThread().getName()); //append the thread name
+		  stringBuilder.append(']');  //append a right bracket
 		}
 		if(options.contains(ReportOption.LOCATION))  //if we should report the program location
 		{
-		  stringBuffer.append(' ');  //append a space
-			stringBuffer.append(getProgramLocation()); //append the program location
+		  stringBuilder.append(' ');  //append a space
+			stringBuilder.append(getProgramLocation()); //append the program location
 		}
 		if(objects.length>0)	//if there are objects to output
 		{			
-			stringBuffer.append(' ');  //append a space
-			stringBuffer.append(':');  //append a colon
+			stringBuilder.append(' ');  //append a space
+			stringBuilder.append(':');  //append a colon
 			for(final Object object:objects)	//for each object
 			{
-				stringBuffer.append(' ');  //append a space
+				stringBuilder.append(' ');  //append a space
 				if(object instanceof Throwable)	//if this is a throwable object
 				{
-					appendStackTrace(stringBuffer, (Throwable)object);	//append a stack trace
+					appendStackTrace(stringBuilder, (Throwable)object);	//append a stack trace
 				}
 				else	//if this is not a throwable object
 				{
-					stringBuffer.append(object);	//append this object's string value with a separator
+					stringBuilder.append(object);	//append this object's string value with a separator
 				}
 			}
 		}
-		final String logString=stringBuffer.toString();  //get the text we constructed
-		synchronized(debug.debugPrintStream)	//synchronize on the print stream
+		stringBuilder.append(LINE_SEPARATOR);	//append the end-of-line character(s)
+		final String logString=stringBuilder.toString();  //get the text we constructed
+		try
 		{
-			debug.debugPrintStream.println(logString);	//send the text using the debug output print stream
-			debug.debugPrintStream.flush(); //make sure the text is flushed to the output
+			debugWriter.write(logString);	//send the text using the debug output writer
+			debugWriter.flush(); //make sure the text is flushed to the output
 		}
-		if(isVisible())	//if we have visual debugging as well
+		catch(final IOException ioException)	//if there is a problem writing the debug information
 		{
-		  debug.logVisibleText(logString);	//show the text visually
+			System.err.println(ioException);	//write the error to the system error output
 		}
-	}
-
-	/**Logs text visibly to the debug frame, if visible debugging is turned on.
-	@param text The text to display.
-	@see #isVisible
-	@see setVisible
-	*/
-	private synchronized void logVisibleText(final String text)
-	{
-		if(isVisible() && isSwingAvailable())	//if visible debugging is turned on
+		if(isVisible())	//if we have visual debugging as well (this method isn't thread-aware, so there is a benign race condition that in the worse case will allow continuing logging for a while after visibility is turned off)
 		{
-			getDebug().debugDisplay.trace(text);  //trace the text using the display
+		  getDebugDisplay().trace(logString);	//show the text visually; this method will block
 		}
 	}
 
@@ -690,75 +607,13 @@ public class Debug
 	*/
 	public static void notify(final String message)
 	{
-//G***del		if(isDebug())	//if debugging is turned on
-		{
-			trace(message);	//trace the message
-			if(getDebug().debugDisplay!=null) //if we have a debug display object
-				getDebug().debugDisplay.notify(message);  //let the debug display object show the message
-/*G***del
-			final String wrappedMessage=StringUtilities.wrap(message, 100);	//wrap the error message at 100 characters G***probably use a constant here
-//G***del when works //G***bring back swing			JOptionPane.showMessageDialog(null, wrappedMessage, "Debug Message", JOptionPane.INFORMATION_MESSAGE);	//G***i18n; comment
-		  if(USE_SWING) //if we're using Swing
-			{
-				try
-				{
-					getDebug().jOptionPaneShowMessageDialogMethod.invoke(null, //G***i18n; comment
-							new Object[]{null, wrappedMessage, "Debug Message", new Integer(JOptionPane.INFORMATION_MESSAGE)}); //call debugTextArea.append()
-				}
-				catch(IllegalAccessException e) {}  //ignore any errors
-				catch(InvocationTargetException e) {}
-			}
-			//G***add code for non-Swing debugging
-*/
-		}
+		trace(message);	//trace the message
+		getDebugDisplay().notify(message);  //let the debug display object show the message
 	}
-
-	/**Returns a user-friendly error message for the given exception.
-		Provides more description messages than the default for some exceptions
-		such as <code>FileNotFoundException</code> and
-		<code>sun.io.MalformedInputException</code>.
-	@param exception The exception for which an error message should be returned.
-	@return The error message for the exception.
-	*/
-/*G***del
-	public static String getErrorMessage(final Exception exception)
-	{
-		if(exception instanceof FileNotFoundException)	//if a file was not found
-		{
-			return "File not found: "+exception.getMessage();	//G***comment; i18n
-		}
-		else if(exception instanceof sun.io.MalformedInputException)	//if there was an error converting characters; G***put this elsewhere, fix for non-Sun JVMs
-		{
-			return "Invalid character encountered for file encoding.";	//G***comment; i18n
-		}
-		else  //for any another error
-		{
-		  final String message=exception.getMessage();  //get the exception message
-			return message!=null ? message : exception.getClass().getName();  //if the message is null, use the class name of the exception as the message
-		}
-	}
-*/
-
-	/**Unconditionally displays an error message for an exception.
-//G***fix	@param title The error message box title.
-	@param exception The exception that caused the error.
-	*/
-//G***del	public static void notifyError(/*G***fix final String title, */final Exception exception)
-	/*G***del
-	{
-		error(exception);	//log the error
-//G***del; this is a user-interface function, so probably do it even if debug has already done it, using the user-friendly error message		if(!isDebug() || (getNotify()&ERROR_LEVEL)==0)	//if we don't have debug turned on, or notifications are turned off for errors
-		{
-			if(getDebug().debugDisplay!=null) //if we have something with which to display notifications
-				getDebug().debugDisplay.error(getErrorMessage(exception));  //let the debug display object show a user-friendly error
-		}
-	}
-*/
 
 	/**Returns a stack trace element of the last line of program execution before
-		a <code>Debug</code> method was entered.
-	@return A stack trace element representing the last line of program execution before
-		a <code>Debug</code> method was entered.
+		a {@link Debug} method was entered.
+	@return A stack trace element representing the last line of program execution before a {@link Debug} method was entered.
 	*/
 	public static StackTraceElement getProgramLocation()
 	{
