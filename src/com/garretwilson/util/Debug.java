@@ -14,12 +14,14 @@ import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.SystemUtilities.*;
 import com.garretwilson.text.W3CDateFormat;
 
-/**Singleton class that encapsulates debugging functionality.
-The singleton instance is created when the class is loaded.
+/**Static class that encapsulates debugging functionality.
 @author Garret Wilson
 */
 public class Debug
 {
+
+	/**Private constructor; this class cannot be publicly instantiated.*/
+	private Debug() {}
 
 	/**Whether or not debugging is turned on.*/
 	private static boolean isDebug=false;
