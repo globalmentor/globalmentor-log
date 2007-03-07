@@ -191,7 +191,7 @@ public class Debug
 	@see #setOutput(java.io.File)
 	@see #setOutput(java.io.PrintStream)
 	*/
-	private static Writer debugWriter=new AsynchronousWriter(new OutputStreamWriter(System.out));
+	private static Writer debugWriter=new OutputStreamWriter(System.out);	//don't wrap this in an AsynchronousWriter; there's no need for it, if we're doing console output, and sending asynchronous output to System.out seems to randomly fail, halting the application and giving no error message
 
 	/**The file being used for debug output, or <code>null</code> if no file is being used.
 	@see #setOutput(java.io.PrintStream)
@@ -429,7 +429,7 @@ public class Debug
 		try
 		{
 			debugWriter.write(logString);	//send the text using the debug output writer
-			debugWriter.flush(); //make sure the text is flushed to the output
+			debugWriter.flush(); //make sure the text is flushed to the output			
 		}
 		catch(final IOException ioException)	//if there is a problem writing the debug information
 		{
