@@ -441,6 +441,42 @@ public class Debug
 		}
 	}
 
+	/**Outputs a series of objects to the standard output if debugging is enabled and the given report level is satisfied.
+	Errors are considered so crucial that they are sent to the standard error output even if debugging is turned off.
+	@param reportLevel The report level requested.
+	@param objects The objects to output. If an object is an instance of <code>Throwable</code>, a stack trace will be generated.
+	*/
+	public static void output(final ReportLevel reportLevel, final Object... objects)
+	{
+		if(getReportLevels().contains(reportLevel))	//if this report level is requested
+		{
+			if(isDebug())	//if debug is turned on
+			{
+				write(reportLevel, objects);	//write the trace information
+			}
+			else if(reportLevel==ReportLevel.ERROR)	//if this is an error, send information to standard output
+			{
+				boolean foundThrowable=false;	//we'll see if a throwable object was passed
+				for(final Object object:objects)	//look at each object
+				{
+					if(object instanceof Throwable)	//if this is a throwable object
+					{
+						foundThrowable=true;	//show that we found a throwable object
+						((Throwable)object).printStackTrace(System.err);  //send a stack trace to the standard error output
+					}
+					else	//if this is not a throwable object
+					{
+						System.err.println(object);	//send the object to the standard error output
+					}
+				}
+				if(!foundThrowable)	//if no throwable object was found TODO do this for debugging, too
+				{
+					new Throwable().printStackTrace(System.err);  //send a stack trace to the standard error output					
+				}				
+			}
+		}
+	}
+
 	/**Outputs a series of objects to the standard output if debugging is enabled.
 		Meant for messages that show the path of program execution.
 	<p>If no objects are provided, only the trace location will be output.</p>
@@ -450,10 +486,7 @@ public class Debug
 	*/
 	public static void trace(final Object... objects)
 	{
-		if(isDebug() && getReportLevels().contains(ReportLevel.TRACE))	//if tracing is enabled
-		{
-			write(ReportLevel.TRACE, objects);	//write the trace information
-		}
+		output(ReportLevel.TRACE, objects);	//output the trace information
 	}
 
 	/**Outputs a stack trace and a series of objects to the standard output if debugging is enabled.
@@ -465,11 +498,8 @@ public class Debug
 	*/
 	public static void traceStack(final Object... objects)
 	{
-		if(isDebug() && getReportLevels().contains(ReportLevel.TRACE))	//if tracing is enabled
-		{
-			write(ReportLevel.TRACE, objects);	//write the trace information
-			write(ReportLevel.TRACE, new Throwable());	//write a stack trace information
-		}
+		trace(objects);	//trace the information
+		trace(new Throwable());	//write a stack trace
 	}
 
 	/**Outputs a formatted message to the debug output if debugging is enabled.
@@ -520,10 +550,7 @@ public class Debug
 	*/
 	public static void info(final Object... objects)
 	{
-		if(isDebug() && getReportLevels().contains(ReportLevel.INFO))	//if information reporting is enabled
-		{
-			write(ReportLevel.INFO, objects);	//write the information
-		}
+		output(ReportLevel.INFO, objects);	//output the info information
 	}
 
 	/**Outputs a series of objects to the standard output if debugging is enabled.
@@ -535,10 +562,7 @@ public class Debug
 	*/
 	public static void log(final Object... objects)
 	{
-		if(isDebug() && getReportLevels().contains(ReportLevel.LOG))	//if logging is enabled
-		{
-			write(ReportLevel.LOG, objects);	//write the log information
-		}
+		output(ReportLevel.LOG, objects);	//output the log information
 	}
 
 	/**Outputs a series of objects to the standard output if debugging is enabled.
@@ -551,10 +575,7 @@ public class Debug
 	*/
 	public static void warn(final Object... objects)
 	{
-		if(isDebug() && getReportLevels().contains(ReportLevel.WARN))	//if warning is enabled
-		{
-			write(ReportLevel.WARN, objects);	//write the warn information
-		}
+		output(ReportLevel.WARN, objects);	//output the warn information
 	}
 
 	/**Outputs a series of objects to the standard output if debugging is enabled.
@@ -562,7 +583,6 @@ public class Debug
 		 -- program logic errors, and exceptions that are not expected to be thrown.
 	Errors are considered so crucial that they are sent to the standard error
 		output even if debugging is turned off.
-	TODO If debugging the notification includes the error level, the error message is also displayed in dialog box.
 	<p>If no objects are provided, only the trace location will be output.</p>
 	@param objects The objects to output. If an object is an instance of <code>Throwable</code>,
 		a stack trace will be generated.
@@ -570,33 +590,7 @@ public class Debug
 	*/
 	public static void error(final Object... objects)
 	{
-		if(getReportLevels().contains(ReportLevel.ERROR))	//if error reporting is enabled
-		{
-			if(isDebug())	//if debug is turned on
-			{
-				write(ReportLevel.ERROR, objects);	//write the error information
-			}
-			else	//if debug is turned off
-			{
-				boolean foundThrowable=false;	//we'll see if a throwable object was passed
-				for(final Object object:objects)	//look at each object
-				{
-					if(object instanceof Throwable)	//if this is a throwable object
-					{
-						foundThrowable=true;	//show that we found a throwable object
-						((Throwable)object).printStackTrace(System.err);  //send a stack trace to the standard error output
-					}
-					else	//if this is not a throwable object
-					{
-						System.err.println(object);	//send the object to the standard error output
-					}
-				}
-				if(!foundThrowable)	//if no throwable object was found TODO do this for debugging, too
-				{
-					new Throwable().printStackTrace(System.err);  //send a stack trace to the standard error output					
-				}
-			}
-		}
+		output(ReportLevel.ERROR, objects);	//output the error information
 	}
 
 	/**Unconditionally displays a message dialog with the given message, whether
