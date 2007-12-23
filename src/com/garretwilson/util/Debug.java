@@ -12,6 +12,8 @@ import com.garretwilson.io.WriterPrintStream;
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.lang.SystemUtilities.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
+
 import com.garretwilson.text.W3CDateFormat;
 
 /**Static class that encapsulates debugging functionality.
@@ -277,7 +279,9 @@ public class Debug
 			{
 				try
 				{
-					debugWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(debugFile, true))));	//open an asynchronous, buffered writer for appending to the file (open this first so that any error will not affect our current status)
+					final OutputStream outputStream=new FileOutputStream(debugFile, true);	//create an output stream
+					outputStream.write(BOM_UTF_8);	//write the UTF-8 byte order mark
+					debugWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(outputStream), UTF_8));	//open an asynchronous, buffered writer for appending to the file in UTF-8 (open this first so that any error will not affect our current status)
 				}
 				catch(final FileNotFoundException fileNotFoundException)	//if we can't open an output stream to the file
 				{
