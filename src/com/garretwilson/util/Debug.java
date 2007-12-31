@@ -9,11 +9,9 @@ import static java.util.Collections.*;
 
 import com.garretwilson.io.AsynchronousWriter;
 import com.garretwilson.io.WriterPrintStream;
-import com.garretwilson.lang.ObjectUtilities;
-
+import com.garretwilson.lang.Objects;
 import static com.garretwilson.lang.SystemUtilities.*;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
-
+import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.W3CDateFormat;
 
 /**Static class that encapsulates debugging functionality.
@@ -253,7 +251,7 @@ public class Debug
 	*/
 	public static synchronized void setOutput(final File file) throws IOException, FileNotFoundException
 	{
-		if(!ObjectUtilities.equals(debugFile, file))	//if the file is really changing
+		if(!Objects.equals(debugFile, file))	//if the file is really changing
 		{
 			if(debugFile!=null)	//if they had a file open already
 			{
