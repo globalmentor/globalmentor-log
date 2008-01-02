@@ -9,10 +9,11 @@ import static java.util.Collections.*;
 
 import com.garretwilson.io.AsynchronousWriter;
 import com.garretwilson.io.WriterPrintStream;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.SystemUtilities.*;
 import static com.garretwilson.text.CharacterEncoding.*;
+import static com.globalmentor.java.SystemUtilities.*;
+
 import com.garretwilson.text.W3CDateFormat;
+import com.globalmentor.java.Objects;
 
 /**Static class that encapsulates debugging functionality.
 @author Garret Wilson
