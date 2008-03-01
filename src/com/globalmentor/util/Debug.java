@@ -1,4 +1,20 @@
-package com.garretwilson.util;
+/*
+ * Copyright © 1996-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.globalmentor.util;
 
 import java.io.*;
 import java.text.*;
@@ -302,31 +318,6 @@ public class Debug
 		}
 	}
 	
-	/**Returns the report levels for which the user should by notified, which will
-		be one or more of the <code>_LEVEL</code> constants ORed together. The
-		default is <code>ERROR_LEVEL</code>.
-	@return The log levels that will cause a notification.
-	@see #notifyLevel
-	*/
-/*TODO fix
-	public static int getNotifyLevel()
-	{
-		return getDebug().notifyLevel; //return the notify level variable
-	}
-*/
-
-	/**Sets the log levels that will cause a notification to be given to the user.
-	@param newNotifyLevel The levels that will notify the user, one or more of the
-		<code>_LEVEL</code> constants ORed together.
-	@see #notifyLevel
-	*/
-/*TODO fix
-	public static void setNotifyLevel(final int newNotifyLevel)
-	{
-		getDebug().notifyLevel=newNotifyLevel;  //update the notify level variable
-	}
-*/
-
 	/**Sets the minimum report levels that will actually be logged.
 	@param minimumLevel The minimum level that will be logged.
 	@see #setReportLevels(Set)
@@ -504,45 +495,6 @@ public class Debug
 		trace(objects);	//trace the information
 		trace(new Throwable());	//write a stack trace
 	}
-
-	/**Outputs a formatted message to the debug output if debugging is enabled.
-		Meant for messages that show the path of program execution.
-		Uses the same formatting as does <code>MessageFormat</code>.
-		This method is preferred to the one-argument version of <code>trace()</code>
-		if the value of multiple objects are being displayed, because
-		<code>MessageFormat.format()</code> will only be called and the values
-		converted to strings if debugging is enabled.
-	@param pattern The message format pattern.
-	@param arguments The object arguments which will be used with the pattern to
-		generate a formatted trace string.
-	@see MessageFormat
-	@see #getDebug
-	@see #isDebug
-	*/
-/*TODO del or fix
-	public static void trace(final String pattern, final Object[] arguments)
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-			write(MessageFormat.format(pattern, arguments));	//format the string and trace the result
-	}
-*/
-
-	/**Outputs the stack trace of a particular error or exception object if
-		debugging is enabled.
-		This represents informational data, not an error condition.
-	@param throwable The object which contains the stack information.
-	@see #getDebug
-	@see #isDebug
-	*/
-/*G***del
-	public static void traceStack(final Throwable throwable)
-	{
-		if(isDebug() && (getReportLevel() & TRACE_LEVEL)>0)	//if debugging is turned on
-		{
-			trace(getStackTrace(throwable));	//send the text from a stack strace of the object as debug trace output
-		}
-	}
-*/
 
 	/**Outputs a series of objects to the standard output if debugging is enabled.
 	Meant for useful information that should not be logged.
