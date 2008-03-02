@@ -23,13 +23,13 @@ import java.util.concurrent.locks.*;
 
 import static java.util.Collections.*;
 
-import static com.garretwilson.text.CharacterEncoding.*;
 import static com.globalmentor.java.SystemUtilities.*;
+import static com.globalmentor.text.CharacterEncoding.*;
 
-import com.garretwilson.text.W3CDateFormat;
 import com.globalmentor.io.AsynchronousWriter;
 import com.globalmentor.io.WriterPrintStream;
 import com.globalmentor.java.Objects;
+import com.globalmentor.text.W3CDateFormat;
 
 /**Static class that encapsulates debugging functionality.
 @author Garret Wilson
