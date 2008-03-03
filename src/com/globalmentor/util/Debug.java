@@ -63,10 +63,10 @@ public class Debug
 	private final static String JFRAME_CLASS_NAME="javax.swing.JFrame";
 
 	/**The name of the DebugAWTDisplay class.*/
-	private final static String DEBUGAWTDISPLAY_CLASS_NAME="com.garretwilson.awt.DebugAWTDisplay";
+	private final static String DEBUGAWTDISPLAY_CLASS_NAME="com.globalmentor.awt.DebugAWTDisplay";
 
 	/**The name of the DebugSwingDisplay class.*/
-	private final static String DEBUGSWINGDISPLAY_CLASS_NAME="com.garretwilson.swing.DebugSwingDisplay";
+	private final static String DEBUGSWINGDISPLAY_CLASS_NAME="com.globalmentor.swing.DebugSwingDisplay";
 
 	/**The lock for allowing lazy creation and access of the debug display.*/
 	private final static Lock debugDisplayLock=new ReentrantLock();
