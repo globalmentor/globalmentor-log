@@ -127,17 +127,28 @@ public class Debug
 		public static boolean isVisible() {return visible;}
 
 		/**Sets whether debugging output is shown in a separate log window. Has no effect if debugging is not turned on.
-		This implementation changes the visible setting synchronizing on the debug display so that it's value will be in synch with the setting of the debug display.
+		This implementation changes the visible setting synchronizing on the debug display so that its value will be in synch with the setting of the debug display.
 		@param visible Whether debugging should be displayed visibly.
 		@see #getDebugDisplay()
 		*/
-		public static void setVisible(final boolean visible)
+		public static void setVisible(final boolean visible)	//TODO the system of locks needs to be updated to latest best practices
 		{
-			final DebugDisplay debugDisplay=getDebugDisplay();	//get the debug display
-			synchronized(debugDisplay)	//keep the debug display setting and the visibility variable in synch
+			debugDisplayLock.lock();	//acquire the debug display lock
+			try
 			{
-				debugDisplay.setEnabled(visible);	//enable or disable the debug display
-				Debug.visible=visible;	//update the local variable to match
+				if(visible || debugDisplay!=null)	//we don't need to change the debug display if no visibility is requested and there is no debug display
+				{
+					final DebugDisplay debugDisplay=getDebugDisplay();	//get the debug display
+					synchronized(debugDisplay)	//keep the debug display setting and the visibility variable in synch
+					{
+						debugDisplay.setEnabled(visible);	//enable or disable the debug display
+						Debug.visible=visible;	//update the local variable to match
+					}
+				}
+			}
+			finally
+			{
+				debugDisplayLock.unlock();	//always release the debug lock
 			}
 		}
 
