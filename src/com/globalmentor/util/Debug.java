@@ -23,7 +23,7 @@ import java.util.concurrent.locks.*;
 
 import static java.util.Collections.*;
 
-import static com.globalmentor.java.SystemUtilities.*;
+import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 
 import com.globalmentor.io.AsynchronousWriter;
