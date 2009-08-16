@@ -218,12 +218,13 @@ public class DefaultLogConfiguration implements LogConfiguration
 		*/
 		public void setLevels(final Set<Log.Level> levels) {this.levels=unmodifiableSet(EnumSet.copyOf(checkInstance(levels, "Levels cannot be null.")));}
 
-		/**Sets the minimum level that will actually be logged.
+		/**Sets the level of log information that will be logged.
+		Any log information at or above the given level will be logged.
 		@param minimumLevel The minimum level that will be logged.
-		@throws NullPointerException if the given minimum level is <code>null</code>.
+		@throws NullPointerException if the given level is <code>null</code>.
 		@see #setLevels(Set)
 		*/
-		public void setMinimumLevel(final Log.Level minimumLevel)
+		public void setLevel(final Log.Level minimumLevel)
 		{
 			final int minimumOrdinal=minimumLevel.ordinal();	//get the ordinal of the minimum level
 			final Set<Log.Level> levels=EnumSet.of(minimumLevel);	//create a set with the minimum level
@@ -247,7 +248,7 @@ public class DefaultLogConfiguration implements LogConfiguration
 		public Set<Log.Report> getReport() {return report;}
 	
 		/**Sets the type of information that should be reported with each log.
-		@param report The information to be reported on.
+		@param report The type of information to report.
 		@throws NullPointerException if the given report is <code>null</code>.
 		*/
 		public void setReport(final Set<Log.Report> report) {this.report=unmodifiableSet(EnumSet.copyOf(checkInstance(report, "Report cannot be null.")));}
@@ -348,12 +349,12 @@ public class DefaultLogConfiguration implements LogConfiguration
 	If a file is given, logging to the standard output will default to disabled.
 	@param file The file to be used for logging, or <code>null</code> if no file is to be used.
 	@param minimumLevel The minimum level that will be logged.
-	@throws NullPointerException if the given minimum level is <code>null</code>.
+	@throws NullPointerException if the given level is <code>null</code>.
 	*/
 	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel)
 	{
 		this(file);
-		setMinimumLevel(minimumLevel);
+		setLevel(minimumLevel);
 	}
 
 	/**Writer and levels constructor.
@@ -372,11 +373,77 @@ public class DefaultLogConfiguration implements LogConfiguration
 	If a writer is given, logging to the standard output will default to disabled.
 	@param writer The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.
 	@param minimumLevel The minimum level that will be logged.
-	@throws NullPointerException if the given minimum level is <code>null</code>.
+	@throws NullPointerException if the given level is <code>null</code>.
 	*/
 	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel)
 	{
 		this(writer);
-		setMinimumLevel(minimumLevel);
+		setLevel(minimumLevel);
 	}
+
+	/**File, levels, and report constructor.
+	If a file is given, logging to the standard output will default to disabled.
+	@param file The file to be used for logging, or <code>null</code> if no file is to be used.
+	@param levels The levels that will be logged.
+	@param report The type of information to report.
+	@throws NullPointerException if the given levels and/or report is <code>null</code>.
+	*/
+	public DefaultLogConfiguration(final File file, final Set<Log.Level> levels, final Set<Log.Report> report)
+	{
+		this(file);
+		setLevels(levels);
+		setReport(report);
+	}
+	
+	/**File, minimum level, and report constructor.
+	If a file is given, logging to the standard output will default to disabled.
+	@param file The file to be used for logging, or <code>null</code> if no file is to be used.
+	@param minimumLevel The minimum level that will be logged.
+	@param report The type of information to report.
+	@throws NullPointerException if the given level and/or report is <code>null</code>.
+	*/
+	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel, final Set<Log.Report> report)
+	{
+		this(file);
+		setLevel(minimumLevel);
+		setReport(report);
+	}
+
+	/**Writer, levels, and report constructor.
+	If a writer is given, logging to the standard output will default to disabled.
+	@param writer The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.
+	@param levels The levels that will be logged.
+	@param report The type of information to report.
+	@throws NullPointerException if the given levels and/or report is <code>null</code>.
+	*/
+	public DefaultLogConfiguration(final Writer writer, final Set<Log.Level> levels, final Set<Log.Report> report)
+	{
+		this(writer);
+		setLevels(levels);
+		setReport(report);
+	}
+	
+	/**Writer, minimum level, and report constructor.
+	If a writer is given, logging to the standard output will default to disabled.
+	@param writer The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.
+	@param minimumLevel The minimum level that will be logged.
+	@param report The type of information to report.
+	@throws NullPointerException if the given level and/or report is <code>null</code>.
+	*/
+	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel, final Set<Log.Report> report)
+	{
+		this(writer);
+		setLevel(minimumLevel);
+		setReport(report);
+	}
+
+
+
+
+
+
+
+
+
+
 }

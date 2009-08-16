@@ -31,7 +31,7 @@ public final class Log
 
 	static
 	{
-		Configurator.setDefaultConfiguration(LogConfiguration.class, new DefaultLogConfiguration());	//install a default log configuration using stdout/err
+		setDefaultConfiguration(new DefaultLogConfiguration());	//install a default log configuration using stdout/err
 	}
 
 	/**Returns the default log configuration.
