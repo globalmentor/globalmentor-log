@@ -34,17 +34,6 @@ public final class Log
 		Configurator.setDefaultConfiguration(LogConfiguration.class, new DefaultLogConfiguration());	//install a default log configuration using stdout/err
 	}
 
-	/**Returns the configured log configuration for the current context.
-	<p>This method is the preferred approach for determining the log configuration,
-	as it ensures a default configuration has been installed.</p>
-	@return The configured log configuration for the current context.
-	@see Configurator#getConfiguration(Class)
-	*/
-	public static LogConfiguration getConfiguration()
-	{
-		return Configurator.getConfiguration(LogConfiguration.class);
-	}
-
 	/**Returns the default log configuration.
 	<p>This method is the preferred approach for determining the default log configuration,
 	as it ensures a default configuration has been installed.</p>
@@ -54,6 +43,28 @@ public final class Log
 	public static LogConfiguration getDefaultConfiguration()
 	{
 		return Configurator.getDefaultConfiguration(LogConfiguration.class);
+	}
+
+	/**Sets the default log configuration.
+	@param configuration The configuration to set.
+	@return The previous configuration, or <code>null</code> if there was no previous configuration.
+	@throws NullPointerException if the given configuration is <code>null</code>.
+	@see Configurator#setDefaultConfiguration(Class)
+	*/
+	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration)
+	{
+		return Configurator.setDefaultConfiguration(LogConfiguration.class, logConfiguration);
+	}
+
+	/**Returns the configured log configuration for the current context.
+	<p>This method is the preferred approach for determining the log configuration,
+	as it ensures a default configuration has been installed.</p>
+	@return The configured log configuration for the current context.
+	@see Configurator#getConfiguration(Class)
+	*/
+	public static LogConfiguration getConfiguration()
+	{
+		return Configurator.getConfiguration(LogConfiguration.class);
 	}
 
 	/**The available logging levels.*/
