@@ -362,24 +362,24 @@ public class DefaultLogger implements Logger
 		trace(new Throwable());	//write a stack trace
 	}
 
-	/**Logs a series of information objects.
+	/**Logs a series of debug objects.
 	<p>Meant for useful information, usually verbose.</p>
+	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
+	@see Log.Level#DEBUG
+	*/
+	public void debug(final Object... objects)
+	{
+		output(Log.Level.DEBUG, objects);
+	}
+
+	/**Logs a series of information objects.
+	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	@see Log.Level#INFO
 	*/
 	public void info(final Object... objects)
 	{
 		output(Log.Level.INFO, objects);
-	}
-
-	/**Logs a series of objects.
-	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#LOG
-	*/
-	public void log(final Object... objects)
-	{
-		output(Log.Level.LOG, objects);
 	}
 
 	/**Logs a series of warning objects

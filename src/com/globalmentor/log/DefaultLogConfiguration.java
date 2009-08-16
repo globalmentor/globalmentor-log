@@ -22,186 +22,17 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
-import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
-import com.globalmentor.util.*;
 
 /**The configuration for default logging.
 <p>The configuration will be used for creating new loggers; changing the configuration
 will not affect previously created loggers.</p>
+<p>This implementation allows the user of a common logger.</p>
 @author Garret Wilson
 @see DefaultLogger
 */
-public class DefaultLogConfiguration implements LogConfiguration
+public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 {
-
-	/**Whether the default logger should be used.
-	This flag is set to <code>false</code> when per-class loggers are configured.
-	*/
-	private boolean useDefaultLogger=true;
-
-	/**The default logger, or <code>null</code> if the default logger has not yet been configured.*/
-	private Logger defaultLogger=null;
-
-	/**@return The default logger, or <code>null</code> if the default logger has not yet been configured.*/
-	public Logger getDefaultLogger() {return defaultLogger;}
-
-	/**Sets the default logger.
-	@param defaultLogger The new default logger.
-	@throws NullPointerException if the given logger is <code>null</code>.
-	*/
-	public void setDefaultLogger(final Logger defaultLogger) {this.defaultLogger=checkInstance(defaultLogger, "Default logger cannot be null.");}
-
-	/**Returns the current default logger.
-	If no default logger has been configured, one is created and configured.
-	@return The default logger, created and configured if necessary.
-	*/
-	protected Logger determineDefaultLogger()
-	{
-		if(defaultLogger==null)	//if no default logger has yet been created (this race condition is benign, because it is assumed that at this point in time multiple threads would create equivalent loggers)
-		{
-			defaultLogger=createLogger();	//create a new logger with the current configuration
-		}
-		return defaultLogger;
-	}
-
-	/**Creates a new logger using the current configuration settings.
-	@return A new logger instance, configured using the current configuration settings.
-	@see #getFile()
-	@see #getWriter()
-	@see #isStandardOutput()
-	@see #getLevels()
-	@see #getReport()
-	*/
-	public Logger createLogger()
-	{
-		final Writer writer=getWriter();	//see if we have a writer specified
-		final DefaultLogger logger=writer!=null ? new DefaultLogger(writer) : new DefaultLogger(getFile());	//configure the logger with a writer or file (the latter of which may be null)
-		logger.setStandardOutput(isStandardOutput());	//set whether the standard output should be used
-		logger.setLevels(getLevels());	//set the levels to report
-		logger.setReport(getReport());	//set the information to report
-		return logger;	//return the created and configured logger
-	}
-
-	/**The map of loggers keyed to classes.
-	Code accessing this map should use its read/write lock.
-	*/
-	private final ReadWriteLockMap<Class<?>, Logger> classLoggerMap=new DecoratorReadWriteLockMap<Class<?>, Logger>(new HashMap<Class<?>, Logger>());
-
-	/**Returns the logger registered for a specific class/interface.
- 	@param objectClass The specific class for which a logger should be returned.
-	@return The logger registered for the specific given class.
-	@throws NullPointerException if the given class is <code>null</code>.
-	*/
-	public Logger getRegisteredLogger(final Class<?> objectClass)
-	{
-		return classLoggerMap.get(checkInstance(objectClass, "Class cannot be null."));
-	}
-
-	/**Registers a logger for a given class/interface and all its sublasses/implementations that don't have specific logger registrations.
- 	If a logger is already configured for the given class, it will be replaced.
- 	@param objectClass The class for which a logger should be registered.
-	@param logger The logger to use for the given class. 
-	@return The logger previously registered for the given class.
-	@throws NullPointerException if the given class and/or logger is <code>null</code>.
-	*/
-	public Logger registerLogger(final Class<?> objectClass, final Logger logger)
-	{
-		classLoggerMap.writeLock().lock();
-		try
-		{
-			final Logger oldLogger=classLoggerMap.put(checkInstance(objectClass, "Class cannot be null."), checkInstance(logger, "Logger cannot be null."));
-			useDefaultLogger=false;	//indicate we now have mappings
-			return oldLogger;
-		}
-		finally
-		{
-			classLoggerMap.writeLock().unlock();
-		}
-	}
-
-	/**Unregisters a logger for a given class/interface.
- 	If no logger is registered for a given class, no action is taken.
- 	@param objectClass The class for which a logger should be unregistered.
-	@return The logger previously registered for the given class.
-	@throws NullPointerException if the given class is <code>null</code>.
-	*/
-	public Logger unregisterLogger(final Class<?> objectClass)
-	{
-		classLoggerMap.writeLock().lock();
-		try
-		{
-			final Logger oldLogger=classLoggerMap.remove(checkInstance(objectClass, "Class cannot be null."));
-			useDefaultLogger=classLoggerMap.isEmpty();	//if the class logger map is empty, use the default logger for everything
-			return oldLogger;
-		}
-		finally
-		{
-			classLoggerMap.writeLock().unlock();
-		}
-	}
-
-	/**Retrieves an appropriate logger.
-	<p>The returned logger may be a default logger, or it may be a logger configured for the calling class.</p>
-	<p>This implementation locates the logger quickly if no class-specific loggers have been configured.
-	Otherwise, a logger is returned for the calling class by delegating to {@link #getLogger(Class)}.</p>
-	@return An appropriate logger for the current circumstances.
-	*/
-	public Logger getLogger()
-	{
-		if(useDefaultLogger)	//if we should use the default logger
-		{
-			return determineDefaultLogger();	//return the default logger, creating it if necessary
-		}
-		return getLogger(getCallingClass(Log.class));	//get a logger for the clasl calling this class (ignoring the Log class, which might have been used for its convenience methods)
-	}
-
-	/**Retrieves the appropriate logger for the given class.
-	<p>This implementation determines a logger in the following manner:
-	If there is no logger configured for the specific class, a logger is searched for using each ancestor class and interface of the given class.
-	If no logger is found for any superclass or interface, the default logger is used.
-	If the default logger does not exist, it will be created using the current settings.
-	If there was no logger configured for the specific class, the determined logger will be associated with the specific class
-	for faster lookups in the future, unless there are no mappings at all, in which case the default logger will immediately be returned.</p>
-	@param objectClass The class for which a logger should be returned.
-	@return The logger configured for the given class.
-	@throws NullPointerException if the given class is <code>null</code>.
-	*/
-	public Logger getLogger(final Class<?> objectClass)
-	{
-		if(useDefaultLogger)	//if we should use the default logger
-		{
-			return determineDefaultLogger();	//return the default logger, creating it if necessary
-		}
-		Logger logger=getRegisteredLogger(objectClass);	//see if we already have a logger for this specific class
-		if(logger==null)	//if we don't yet have a logger for this class
-		{
-			classLoggerMap.writeLock().lock();
-			try
-			{
-				for(final Class<?> ancestorClass:getAncestorClasses(objectClass))	//look at all the classes and interfaces (including this one, now that we're under a write lock)
-				{
-					logger=getRegisteredLogger(ancestorClass);	//see if we already have a logger for this ancestor class
-					if(logger!=null)	//if we found a logger for this class
-					{
-						registerLogger(objectClass, logger);	//register the logger with the specific class to speed searches the next time
-						break;	//stop looking for a logger for an ancestor class
-					}
-				}
-			}
-			finally
-			{
-				classLoggerMap.writeLock().unlock();
-			}
-		}
-		if(logger==null)	//if we couldn't find a registered logger for any of the ancestor classes
-		{
-			logger=determineDefaultLogger();	//determine the default logger to use
-			registerLogger(objectClass, logger);	//register the logger with the specific class to speed searches the next time
-		}
-		return logger;
-	}
 
 	/**The levels that should be logged.*/
 	private Set<Log.Level> levels=unmodifiableSet(EnumSet.allOf(Log.Level.class));
@@ -319,6 +150,7 @@ public class DefaultLogConfiguration implements LogConfiguration
 	*/
 	public DefaultLogConfiguration(final File file)
 	{
+		super(true);	//allow the use of a common logger
 		this.file=file;
 		setStandardOutput(file!=null);	//by default turn off logging to the standard output if a writer was given
 	}
@@ -329,6 +161,7 @@ public class DefaultLogConfiguration implements LogConfiguration
 	*/
 	public DefaultLogConfiguration(final Writer writer)
 	{
+		super(true);	//allow the use of a common logger
 		this.writer=writer;
 		setStandardOutput(writer!=null);	//by default turn off logging to the standard output if a writer was given
 	}
@@ -437,13 +270,23 @@ public class DefaultLogConfiguration implements LogConfiguration
 		setReport(report);
 	}
 
-
-
-
-
-
-
-
-
+	/**Creates a new logger for the given class, configured using the current configuration settings.
+ 	@param objectClass The specific class for which a logger should be returned.
+	@return A new logger instance for the given class.
+	@see #getFile()
+	@see #getWriter()
+	@see #isStandardOutput()
+	@see #getLevels()
+	@see #getReport()
+	*/
+	public Logger createLogger(final Class<?> objectClass)
+	{
+		final Writer writer=getWriter();	//see if we have a writer specified
+		final DefaultLogger logger=writer!=null ? new DefaultLogger(writer) : new DefaultLogger(getFile());	//configure the logger with a writer or file (the latter of which may be null)
+		logger.setStandardOutput(isStandardOutput());	//set whether the standard output should be used
+		logger.setLevels(getLevels());	//set the levels to report
+		logger.setReport(getReport());	//set the information to report
+		return logger;	//return the created and configured logger
+	}
 
 }

@@ -73,9 +73,9 @@ public final class Log
 		/**Indicates the program's execution path.*/
 		TRACE,
 		/**Indicates useful information, usually verbose.*/
-		INFO,
+		DEBUG,
 		/**Specific information on an event which should be logged but which is adversity-neutral.*/
-		LOG,
+		INFO,
 		/**Indications that conditions are possibly adverse.*/
 		WARN,
 		/**Indicates an unexpected condition representing an error.*/
@@ -141,8 +141,30 @@ public final class Log
 		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).traceStack(objects);
 	}
 
-	/**Logs a series of information objects.
+	/**Logs a series of debug objects.
 	<p>Meant for useful information, usually verbose.</p>
+	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
+	@see Log.Level#DEBUG
+	*/
+	public static void debug(final Object... objects)
+	{
+		Configurator.getConfiguration(LogConfiguration.class).getLogger().debug(objects);
+	}
+
+	/**Logs a series of debug objects.
+	<p>Meant for useful information, usually verbose.</p>
+	@param objectClass The class for which a logger should be returned.
+	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
+	@throws NullPointerException if the given class is <code>null</code>.
+	@see Log.Level#DEBUG
+	*/
+	public static void debug(final Class<?> objectClass, final Object... objects)
+	{
+		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).debug(objects);
+	}
+
+	/**Logs a series of information objects.
+	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	@see Log.Level#INFO
 	*/
@@ -152,7 +174,7 @@ public final class Log
 	}
 
 	/**Logs a series of information objects.
-	<p>Meant for useful information, usually verbose.</p>
+	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
 	@param objectClass The class for which a logger should be returned.
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	@throws NullPointerException if the given class is <code>null</code>.
@@ -161,28 +183,6 @@ public final class Log
 	public static void info(final Class<?> objectClass, final Object... objects)
 	{
 		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).info(objects);
-	}
-
-	/**Logs a series of objects.
-	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#LOG
-	*/
-	public static void log(final Object... objects)
-	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().log(objects);
-	}
-
-	/**Logs a series of objects.
-	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
-	@param objectClass The class for which a logger should be returned.
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@throws NullPointerException if the given class is <code>null</code>.
-	@see Log.Level#LOG
-	*/
-	public static void log(final Class<?> objectClass, final Object... objects)
-	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).log(objects);
 	}
 
 	/**Logs a series of warning objects
