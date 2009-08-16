@@ -25,7 +25,8 @@ import static com.globalmentor.java.Objects.*;
 
 /**An abstract base implementation of logging configuration.
 <p>This implementation uses a concurrent map which is thread-safe but still allows race conditions.
-It is assumed that it is benign if multiple loggers get created temporarily for a class.</p> 
+It is assumed that it is benign if multiple loggers get created temporarily for a class.</p>
+<p>The logger created in {@link #createLogger(Class)} should take into consideration the key returned by {@link #getLoggerKey(Class)} if appropriate.</p>
 @param <K> The type of key with which loggers are associated.
 @author Garret Wilson
 */
@@ -68,12 +69,6 @@ public abstract class AbstractLogConfiguration<K> implements LogConfiguration
 			}
 			return commonLogger;
 		}
-
-	/**Creates a new logger for the given class, configured using the current configuration settings.
- 	@param objectClass The specific class for which a logger should be returned.
-	@return A new logger instance for the given class.
-	*/
-	public abstract Logger createLogger(final Class<?> objectClass);
 
 	/**Determines the object related to the given class with which a logger should be associated.
 	This could be the package of the class if loggers are grouped according to package,

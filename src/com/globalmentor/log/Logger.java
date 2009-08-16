@@ -55,7 +55,7 @@ public interface Logger
 	<p>Meant for errors that should not prevent the robust functioning of the program
 		and that are expected to occur infrequently and not because of program design.</p>
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#WARN
+	@see Log.Level#WARNING
 	*/
 	public void warn(final Object... objects);
 

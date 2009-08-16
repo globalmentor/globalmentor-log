@@ -337,22 +337,19 @@ public class DefaultLogger implements Logger
 		}
 	}
 
-	/**Logs a series of trace objects.
-	<p>Meant for messages that show the path of program execution.</p>
-	@param objects The objects to log.
-	@see Log.Level#TRACE
+	/**{@inheritDoc}
+	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
+	@Override
 	public void trace(final Object... objects)
 	{
 		output(Log.Level.TRACE, objects);
 	}
 
-	/**Logs a series of trace objects and a stack trace.
-	<p>Meant for messages that show the path of program execution.</p>
-	<p>If no objects are provided, only the trace location will be output.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#TRACE
+	/**{@inheritDoc}
+	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
+	@Override
 	public void traceStack(final Object... objects)
 	{
 		if(objects.length>0)
@@ -362,42 +359,37 @@ public class DefaultLogger implements Logger
 		trace(new Throwable());	//write a stack trace
 	}
 
-	/**Logs a series of debug objects.
-	<p>Meant for useful information, usually verbose.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#DEBUG
+	/**{@inheritDoc}
+	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
+	@Override
 	public void debug(final Object... objects)
 	{
 		output(Log.Level.DEBUG, objects);
 	}
 
-	/**Logs a series of information objects.
-	<p>Meant for logging specific events which should be logged but which are adversity-neutral.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#INFO
+	/**{@inheritDoc}
+	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
+	@Override
 	public void info(final Object... objects)
 	{
 		output(Log.Level.INFO, objects);
 	}
 
-	/**Logs a series of warning objects
-	<p>Meant for errors that should not prevent the robust functioning of the program
-		and that are expected to occur infrequently and not because of program design.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#WARN
+	/**{@inheritDoc}
+	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
+	@Override
 	public void warn(final Object... objects)
 	{
-		output(Log.Level.WARN, objects);
+		output(Log.Level.WARNING, objects);
 	}
 
-	/**Logs a series of error objects.
-	<p>Meant for unexpected conditions representing errors.</p>
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#ERROR
+	/**{@inheritDoc}
+	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
+	@Override
 	public void error(final Object... objects)
 	{
 		output(Log.Level.ERROR, objects);

@@ -16,10 +16,8 @@
 
 package com.globalmentor.log;
 
-import java.io.File;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
-
 import static java.util.Collections.*;
 
 import static com.globalmentor.java.Objects.*;
@@ -134,7 +132,6 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 		@param standardOutput Whether information should be sent to the standard output.
 		*/
 		public void setStandardOutput(final boolean standardOutput) {this.standardOutput=standardOutput;}
-
 
 	/**Default constructor.
 	Logging to the standard output will be enabled by default.

@@ -16,31 +16,29 @@
 
 package com.globalmentor.log;
 
-import com.globalmentor.config.Configuration;
-
-/**Configuration for logging.
+/**A log configuration that creates Java loggers.
 @author Garret Wilson
+@see java.util.logging.Logger
 */
-public interface LogConfiguration extends Configuration
+public class JavaLoggingLogConfiguration extends AbstractAffiliationLogConfiguration
 {
 
-	/**Retrieves an appropriate logger.
-	<p>The returned logger may be a default logger, or it may be a logger configured for the calling class.</p>
-	@return An appropriate logger for the current circumstances.
-	*/
-	public Logger getLogger();
-
-	/**Retrieves the appropriate logger for the given class.
-	@param objectClass The class for which a logger should be returned.
-	@return The logger configured for the given class.
-	@throws NullPointerException if the given class is <code>null</code>.
-	*/
-	public Logger getLogger(final Class<?> objectClass);
+	/**Default constructor.*/
+	public JavaLoggingLogConfiguration()
+	{
+		super(false);	//do not allow the use of a common logger
+	}
 
 	/**Creates a new logger for the given class, configured using the current configuration settings.
  	@param objectClass The specific class for which a logger should be returned.
 	@return A new logger instance for the given class.
+	@see #getLoggerKey(Class)
+	@see java.util.logging.Logger#getLogger(String)
 	*/
-	public Logger createLogger(final Class<?> objectClass);
+	public Logger createLogger(final Class<?> objectClass)
+	{
+		final Object loggerKey=getLoggerKey(objectClass);	//get a key for associating the class to a logger
+		return new JavaLoggingLogger(java.util.logging.Logger.getLogger(loggerKey.toString()));	//get a Java logging logger and return a logger from that
+	}
 
 }

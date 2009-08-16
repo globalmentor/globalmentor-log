@@ -77,7 +77,7 @@ public final class Log
 		/**Specific information on an event which should be logged but which is adversity-neutral.*/
 		INFO,
 		/**Indications that conditions are possibly adverse.*/
-		WARN,
+		WARNING,
 		/**Indicates an unexpected condition representing an error.*/
 		ERROR
 	}; 
@@ -189,7 +189,7 @@ public final class Log
 	<p>Meant for errors that should not prevent the robust functioning of the program
 		and that are expected to occur infrequently and not because of program design.</p>
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#WARN
+	@see Log.Level#WARNING
 	*/
 	public static void warn(final Object... objects)
 	{
@@ -202,7 +202,7 @@ public final class Log
 	@param objectClass The class for which a logger should be returned.
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	@throws NullPointerException if the given class is <code>null</code>.
-	@see Log.Level#WARN
+	@see Log.Level#WARNING
 	*/
 	public static void warn(final Class<?> objectClass, final Object... objects)
 	{
