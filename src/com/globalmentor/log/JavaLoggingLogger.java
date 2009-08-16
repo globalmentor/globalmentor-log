@@ -16,9 +16,8 @@
 
 package com.globalmentor.log;
 
-import com.globalmentor.java.Throwables;
-
 import static com.globalmentor.java.Strings.*;
+import static com.globalmentor.java.Throwables.*;
 
 /**A logger that delegates to a Java logger.
 <p>The log levels in this implementation correspond as follows:</p>
@@ -63,7 +62,7 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 		{
 			trace(objects);	//trace the information
 		}
-		trace(Throwables.getStackTraceString(new Throwable()));	//write a stack trace
+		trace(getStackTraceString(new Throwable()));	//write a stack trace
 	}
 
 	/**{@inheritDoc}

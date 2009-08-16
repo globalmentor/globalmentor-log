@@ -16,16 +16,19 @@
 
 package com.globalmentor.log;
 
-/**A log configuration that creates Java loggers.
-<p>This class provides no global Java logging configuration; the system-level Java logging and must be configured externally.</p>
+/**A log configuration that creates Log4j loggers.
+<p>This class provides no global Log4j configuration; the system-level Log4j logging and must be configured externally.</p>
 @author Garret Wilson
-@see java.util.logging.Logger
+@see org.apache.log4j.BasicConfigurator
+@see org.apache.log4j.PropertyConfigurator
+@see org.apache.log4j.xml.DOMConfigurator
+@see org.apache.log4j.Logger
 */
-public class JavaLoggingLogConfiguration extends AbstractAffiliationLogConfiguration
+public class Log4jLogConfiguration extends AbstractAffiliationLogConfiguration
 {
 
 	/**Default constructor.*/
-	public JavaLoggingLogConfiguration()
+	public Log4jLogConfiguration()
 	{
 		super(false);	//do not allow the use of a common logger
 	}
@@ -34,12 +37,21 @@ public class JavaLoggingLogConfiguration extends AbstractAffiliationLogConfigura
  	@param objectClass The specific class for which a logger should be returned.
 	@return A new logger instance for the given class.
 	@see #getLoggerKey(Class)
-	@see java.util.logging.Logger#getLogger(String)
+	@see org.apache.log4j.Logger#getLogger(String)
 	*/
 	public Logger createLogger(final Class<?> objectClass)
 	{
 		final Object loggerKey=getLoggerKey(objectClass);	//get a key for associating the class to a logger
-		return new JavaLoggingLogger(java.util.logging.Logger.getLogger(loggerKey.toString()));	//get a Java logging logger and return a logger from that
+		final org.apache.log4j.Logger logger;
+		if(loggerKey instanceof Class<?>)	//if the logger key is a class
+		{
+			logger=org.apache.log4j.Logger.getLogger((Class<?>)loggerKey);	//get a logger based upon the class
+		}
+		else	//if the logger key is any other type of objects
+		{
+			logger=org.apache.log4j.Logger.getLogger(loggerKey.toString());	//get a logger based upon the string form of the key
+		}
+		return new Log4jLogger(logger);	//return a logger for the Log4j logger
 	}
 
 }

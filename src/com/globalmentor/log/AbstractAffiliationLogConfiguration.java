@@ -33,7 +33,6 @@ public abstract class AbstractAffiliationLogConfiguration extends AbstractLogCon
 
 		/**Loggers are associated with packages.*/
 		PACKAGE;
-		
 	}
 
 	/**The granularity with which loggers are associated with classes.*/
