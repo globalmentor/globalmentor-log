@@ -34,6 +34,34 @@ public final class Log
 		setDefaultConfiguration(new DefaultLogConfiguration());	//install a default log configuration using stdout/err
 	}
 
+	/**The available logging levels.*/
+	public enum Level
+	{
+		/**Indicates the program's execution path.*/
+		TRACE,
+		/**Indicates useful information, usually verbose.*/
+		DEBUG,
+		/**Specific information on an event which should be logged but which is adversity-neutral.*/
+		INFO,
+		/**Indications that conditions are possibly adverse.*/
+		WARNING,
+		/**Indicates an unexpected condition representing an error.*/
+		ERROR
+	}; 
+
+	/**The available reporting options.*/
+	public enum Report
+	{
+		/**Indicates that the log level should be reported.*/
+		LEVEL,	
+		/**Indicates that execution time should be reported.*/
+		TIME,
+		/**Indicates that the thread name should be reported.*/
+		THREAD,
+		/**Indicates that the location of program execution should be reported.*/
+		LOCATION
+	}
+
 	/**Returns the default log configuration.
 	<p>This method is the preferred approach for determining the default log configuration,
 	as it ensures a default configuration has been installed.</p>
@@ -67,32 +95,23 @@ public final class Log
 		return Configurator.getConfiguration(LogConfiguration.class);
 	}
 
-	/**The available logging levels.*/
-	public enum Level
+	/**Retrieves an appropriate logger using the appropriate configuration.
+	<p>The returned logger may be a default logger, or it may be a logger configured for the calling class.</p>
+	@return An appropriate logger for the current circumstances.
+	*/
+	public static Logger getLogger()
 	{
-		/**Indicates the program's execution path.*/
-		TRACE,
-		/**Indicates useful information, usually verbose.*/
-		DEBUG,
-		/**Specific information on an event which should be logged but which is adversity-neutral.*/
-		INFO,
-		/**Indications that conditions are possibly adverse.*/
-		WARNING,
-		/**Indicates an unexpected condition representing an error.*/
-		ERROR
-	}; 
+		return getConfiguration().getLogger();
+	}
 
-	/**The available reporting options.*/
-	public enum Report
+	/**Retrieves the appropriate logger for the given class for the appropriate configuration.
+	@param objectClass The class for which a logger should be returned.
+	@return The logger configured for the given class.
+	@throws NullPointerException if the given class is <code>null</code>.
+	*/
+	public static Logger getLogger(final Class<?> objectClass)
 	{
-		/**Indicates that the log level should be reported.*/
-		LEVEL,	
-		/**Indicates that execution time should be reported.*/
-		TIME,
-		/**Indicates that the thread name should be reported.*/
-		THREAD,
-		/**Indicates that the location of program execution should be reported.*/
-		LOCATION
+		return getConfiguration().getLogger(objectClass);
 	}
 
 	/**Logs a series of trace objects.
@@ -102,7 +121,7 @@ public final class Log
 	*/
 	public static void trace(final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().trace(objects);
+		getConfiguration().getLogger().trace(objects);
 	}
 
 	/**Logs a series of trace objects.
@@ -114,7 +133,7 @@ public final class Log
 	*/
 	public static void trace(final Class<?> objectClass, final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).trace(objects);
+		getConfiguration().getLogger(objectClass).trace(objects);
 	}
 
 	/**Logs a series of trace objects and a stack trace.
@@ -125,7 +144,7 @@ public final class Log
 	*/
 	public static void traceStack(final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().traceStack(objects);
+		getConfiguration().getLogger().traceStack(objects);
 	}
 
 	/**Logs a series of trace objects and a stack trace.
@@ -138,7 +157,7 @@ public final class Log
 	*/
 	public static void traceStack(final Class<?> objectClass, final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).traceStack(objects);
+		getConfiguration().getLogger(objectClass).traceStack(objects);
 	}
 
 	/**Logs a series of debug objects.
@@ -148,7 +167,7 @@ public final class Log
 	*/
 	public static void debug(final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().debug(objects);
+		getConfiguration().getLogger().debug(objects);
 	}
 
 	/**Logs a series of debug objects.
@@ -160,7 +179,7 @@ public final class Log
 	*/
 	public static void debug(final Class<?> objectClass, final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).debug(objects);
+		getConfiguration().getLogger(objectClass).debug(objects);
 	}
 
 	/**Logs a series of information objects.
@@ -170,7 +189,7 @@ public final class Log
 	*/
 	public static void info(final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().info(objects);
+		getConfiguration().getLogger().info(objects);
 	}
 
 	/**Logs a series of information objects.
@@ -182,7 +201,7 @@ public final class Log
 	*/
 	public static void info(final Class<?> objectClass, final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).info(objects);
+		getConfiguration().getLogger(objectClass).info(objects);
 	}
 
 	/**Logs a series of warning objects
@@ -193,7 +212,7 @@ public final class Log
 	*/
 	public static void warn(final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().warn(objects);
+		getConfiguration().getLogger().warn(objects);
 	}
 
 	/**Logs a series of warning objects
@@ -206,7 +225,7 @@ public final class Log
 	*/
 	public static void warn(final Class<?> objectClass, final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).warn(objects);
+		getConfiguration().getLogger(objectClass).warn(objects);
 	}
 
 	/**Logs a series of error objects.
@@ -216,7 +235,7 @@ public final class Log
 	*/
 	public static void error(final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger().error(objects);
+		getConfiguration().getLogger().error(objects);
 	}
 
 	/**Logs a series of error objects, using the configured logger for the given class.
@@ -228,7 +247,7 @@ public final class Log
 	*/
 	public static void error(final Class<?> objectClass, final Object... objects)
 	{
-		Configurator.getConfiguration(LogConfiguration.class).getLogger(objectClass).error(objects);
+		getConfiguration().getLogger(objectClass).error(objects);
 	}
 
 }
