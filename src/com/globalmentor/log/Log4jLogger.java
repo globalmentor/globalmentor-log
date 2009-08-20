@@ -16,8 +16,8 @@
 
 package com.globalmentor.log;
 
+import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.java.Strings.*;
-import static com.globalmentor.util.Arrays.*;
 
 /**A logger that delegates to a Java logger.
 <p>The log levels in this implementation correspond as follows:</p>

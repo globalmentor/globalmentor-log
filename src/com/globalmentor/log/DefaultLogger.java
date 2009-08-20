@@ -22,6 +22,9 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
+import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.AsynchronousWriter;
 import com.globalmentor.io.ByteOrderMark;
