@@ -22,7 +22,7 @@ import static com.globalmentor.java.Objects.*;
 @param <L> The type of delegate logger.
 @author Garret Wilson
 */
-public abstract class AbstractAdapterLogger<L> implements Logger
+public abstract class AbstractAdapterLogger<L> extends AbstractLogger
 {
 
 	/**The logger delegate.*/

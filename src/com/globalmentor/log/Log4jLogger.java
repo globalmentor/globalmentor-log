@@ -25,7 +25,7 @@ import static com.globalmentor.java.Strings.*;
 	<dt>{@link Log.Level#TRACE}</dt> <dd>{@link org.apache.log4j.Level#TRACE}</dd>
 	<dt>{@link Log.Level#DEBUG}</dt> <dd>{@link org.apache.log4j.Level#DEBUG}</dd>
 	<dt>{@link Log.Level#INFO}</dt> <dd>{@link org.apache.log4j.Level#INFO}</dd>
-	<dt>{@link Log.Level#WARNING}</dt> <dd>{@link org.apache.log4j.Level#WARN}</dd>
+	<dt>{@link Log.Level#WARN}</dt> <dd>{@link org.apache.log4j.Level#WARN}</dd>
 	<dt>{@link Log.Level#ERROR}</dt> <dd>{@link org.apache.log4j.Level#ERROR}</dd>
 </dl>
 @author Garret Wilson

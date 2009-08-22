@@ -16,39 +16,39 @@
 
 package com.globalmentor.io;
 
-import static com.globalmentor.io.Charsets.*;
-import static com.globalmentor.java.Objects.*;
-
 import java.io.*;
 
-import com.globalmentor.util.Debug;
+import static com.globalmentor.io.Charsets.*;
+import static com.globalmentor.java.Objects.*;
+import com.globalmentor.log.Log;
 
 /**An output stream that logs all transferred bytes of a decorated stream.
 @author Garret Wilson
+@see Log
 */
-public class DebugOutputStream extends OutputStreamDecorator<OutputStream>
+public class LogOutputStream extends OutputStreamDecorator<OutputStream>
 {
 
-	/**The log report level to use.*/
-	private final Debug.ReportLevel reportLevel;
+	/**The log level to use.*/
+	private final Log.Level logLevel;
 
-	/**Decorates the given output stream with a report level of {@link Debug.ReportLevel#LOG}.
+	/**Decorates the given output stream with a report level of {@link Log.Level#INFO}.
 	@param outputStream The output stream to decorate.
 	@exception NullPointerException if the given stream is <code>null</code>.
 	*/
-	public DebugOutputStream(final OutputStream outputStream)
+	public LogOutputStream(final OutputStream outputStream)
 	{
-		this(outputStream, Debug.ReportLevel.LOG);
+		this(outputStream, Log.Level.INFO);
 	}
 
 	/**Decorates the given output stream.
 	@param outputStream The output stream to decorate.
-	@exception NullPointerException if the given stream and/or report level is <code>null</code>.
+	@exception NullPointerException if the given stream and/or log level is <code>null</code>.
 	*/
-	public DebugOutputStream(final OutputStream outputStream, final Debug.ReportLevel reportLevel)
+	public LogOutputStream(final OutputStream outputStream, final Log.Level logLevel)
 	{
 		super(outputStream);	//construct the parent class
-		this.reportLevel=checkInstance(reportLevel, "Report level cannot be null.");
+		this.logLevel=checkInstance(logLevel, "Log level cannot be null.");
 	}
 
   /**
@@ -68,10 +68,7 @@ public class DebugOutputStream extends OutputStreamDecorator<OutputStream>
    */
 	public void write(int b) throws IOException
 	{
-		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-		{
-			Debug.getOutput().write(b);
-		}
+  	Log.log(logLevel, Character.valueOf((char)b));
 		super.write(b);	//do the default writing
 	}
 
@@ -87,10 +84,7 @@ public class DebugOutputStream extends OutputStreamDecorator<OutputStream>
    */
   public void write(byte b[]) throws IOException
 	{
-		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-		{
-			Debug.getOutput().write(new String(b, US_ASCII_CHARSET));
-		}
+  	Log.log(logLevel, new String(b, US_ASCII_CHARSET));
 		super.write(b);	//do the default writing
   }
 
@@ -124,10 +118,7 @@ public class DebugOutputStream extends OutputStreamDecorator<OutputStream>
    */
   public void write(byte b[], int off, int len) throws IOException
 	{
-		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-		{
-			Debug.getOutput().write(new String(b, off, len, US_ASCII_CHARSET));
-		}
+  	Log.log(logLevel, new String(b, off, len, US_ASCII_CHARSET));
 		super.write(b, off, len);	//do the default writing
   }
 

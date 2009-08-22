@@ -44,7 +44,7 @@ public final class Log
 		/**Specific information on an event which should be logged but which is adversity-neutral.*/
 		INFO,
 		/**Indications that conditions are possibly adverse.*/
-		WARNING,
+		WARN,
 		/**Indicates an unexpected condition representing an error.*/
 		ERROR
 	}; 
@@ -208,7 +208,7 @@ public final class Log
 	<p>Meant for errors that should not prevent the robust functioning of the program
 		and that are expected to occur infrequently and not because of program design.</p>
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@see Log.Level#WARNING
+	@see Log.Level#WARN
 	*/
 	public static void warn(final Object... objects)
 	{
@@ -221,7 +221,7 @@ public final class Log
 	@param objectClass The class for which a logger should be returned.
 	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	@throws NullPointerException if the given class is <code>null</code>.
-	@see Log.Level#WARNING
+	@see Log.Level#WARN
 	*/
 	public static void warn(final Class<?> objectClass, final Object... objects)
 	{
@@ -248,6 +248,27 @@ public final class Log
 	public static void error(final Class<?> objectClass, final Object... objects)
 	{
 		getConfiguration().getLogger(objectClass).error(objects);
+	}
+
+	/**Logs a series of objects at a given log level.
+	@param level The level at which to log the objects.
+	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
+	@throws NullPointerException if the given log level is <code>null</code>.
+	*/
+	public static void log(final Log.Level level, final Object... objects)
+	{
+		getConfiguration().getLogger().log(level, objects);
+	}
+
+	/**Logs a series of objects at a given log level.
+	@param objectClass The class for which a logger should be returned.
+	@param level The level at which to log the objects.
+	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
+	@throws NullPointerException if the given object class and/or log level is <code>null</code>.
+	*/
+	public static void log(final Class<?> objectClass, final Log.Level level, final Object... objects)
+	{
+		getConfiguration().getLogger(objectClass).log(level, objects);
 	}
 
 }

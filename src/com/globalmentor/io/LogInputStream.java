@@ -21,37 +21,38 @@ import static java.lang.Math.*;
 
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
-import com.globalmentor.util.Debug;
+import com.globalmentor.log.Log;
 
 /**An input stream that logs all transferred bytes of a decorated stream.
 @author Garret Wilson
+@see Log
 */
-public class DebugInputStream extends InputStreamDecorator<InputStream>
+public class LogInputStream extends InputStreamDecorator<InputStream>
 {
 
 	/**The size of the local buffer used for skipping.*/
 	private final long SKIP_BUFFER_SIZE=2048;
 
-	/**The log report level to use.*/
-	private final Debug.ReportLevel reportLevel;
+	/**The log level to use.*/
+	private final Log.Level logLevel;
 
-	/**Decorates the given input stream with a report level of {@link Debug.ReportLevel#LOG}.
+	/**Decorates the given input stream with a log level of {@link Log.LEVEL#INFO}.
 	@param inputStream The input stream to decorate.
 	@exception NullPointerException if the given stream is <code>null</code>.
 	*/
-	public DebugInputStream(final InputStream inputStream)
+	public LogInputStream(final InputStream inputStream)
 	{
-		this(inputStream, Debug.ReportLevel.LOG);
+		this(inputStream, Log.Level.INFO);
 	}
 
 	/**Decorates the given input stream.
 	@param inputStream The input stream to decorate.
-	@exception NullPointerException if the given stream and/or report level is <code>null</code>.
+	@exception NullPointerException if the given stream and/or log level is <code>null</code>.
 	*/
-	public DebugInputStream(final InputStream inputStream, final Debug.ReportLevel reportLevel)
+	public LogInputStream(final InputStream inputStream, final Log.Level logLevel)
 	{
 		super(inputStream);	//construct the parent class
-		this.reportLevel=checkInstance(reportLevel, "Report level cannot be null.");
+		this.logLevel=checkInstance(logLevel, "Log level cannot be null.");
 	}
 
   /**
@@ -71,10 +72,7 @@ public class DebugInputStream extends InputStreamDecorator<InputStream>
   public int read() throws IOException
 	{
   	final int b=super.read();	//read data normally
-		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-		{
-			Debug.getOutput().write(b);
-		}
+  	Log.log(logLevel, Character.valueOf((char)b));
   	return b;	//return the data read
 	}
 
@@ -120,10 +118,7 @@ public class DebugInputStream extends InputStreamDecorator<InputStream>
   	final int count=super.read(b);	//read data normally
   	if(count>0)	//if data was read
   	{
-  		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-  		{
-  			Debug.getOutput().write(new String(b, US_ASCII_CHARSET));
-  		}
+    	Log.log(logLevel, new String(b, US_ASCII_CHARSET));
   	}
   	return count;	//return the amount of data read
 	}
@@ -195,10 +190,7 @@ public class DebugInputStream extends InputStreamDecorator<InputStream>
   	final int count=super.read(b, off, len);	//read data normally
   	if(count>0)	//if data was read
   	{
-  		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-  		{
-  			Debug.getOutput().write(new String(b, off, len, US_ASCII_CHARSET));
-  		}
+    	Log.log(logLevel, new String(b, off, len, US_ASCII_CHARSET));
   	}
   	return count;	//return the amount of data read
 	}
@@ -220,26 +212,19 @@ public class DebugInputStream extends InputStreamDecorator<InputStream>
    */
   public long skip(final long n) throws IOException
 	{
-		if(Debug.getReportLevels().contains(reportLevel) && Debug.isDebug())	//if this report level is requested and debugging is turned on
-		{
-	  	final byte[] buffer=new byte[(int)min(n, SKIP_BUFFER_SIZE)];	//make a buffer only as large as needed (we can cast to an int, because we know that at least one of the values is an int, and we're taking the minimum of the two)
-	  	final int bufferSize=buffer.length;	//get the length of the buffer
-	  	long bytesLeft=n;	//we'll start out needing to read all the bytes
-	  	int bufferBytesRead=0;	//we'll keep track of how many bytes we read each time
-	  	while(bytesLeft>0 && bufferBytesRead>=0)	//while there are bytes left and we haven't reached the end of the stream
+  	final byte[] buffer=new byte[(int)min(n, SKIP_BUFFER_SIZE)];	//make a buffer only as large as needed (we can cast to an int, because we know that at least one of the values is an int, and we're taking the minimum of the two)
+  	final int bufferSize=buffer.length;	//get the length of the buffer
+  	long bytesLeft=n;	//we'll start out needing to read all the bytes
+  	int bufferBytesRead=0;	//we'll keep track of how many bytes we read each time
+  	while(bytesLeft>0 && bufferBytesRead>=0)	//while there are bytes left and we haven't reached the end of the stream
+  	{
+  		bufferBytesRead=read(buffer, 0, (int)min(bytesLeft, bufferSize));	//read as many bytes as we have left, or as many as our buffer can hold, whichever is less; this will also automatically capture our data
+	  	if(bufferBytesRead>0)	//if we read any bytes at all (this could be negative, so don't blindly subtract; but since we're checking anyway, we might as well throw out the zero case)
 	  	{
-	  		bufferBytesRead=read(buffer, 0, (int)min(bytesLeft, bufferSize));	//read as many bytes as we have left, or as many as our buffer can hold, whichever is less; this will also automatically capture our data
-		  	if(bufferBytesRead>0)	//if we read any bytes at all (this could be negative, so don't blindly subtract; but since we're checking anyway, we might as well throw out the zero case)
-		  	{
-		  		bytesLeft-=bufferBytesRead;	//decrease the bytes left by the number read
-		  	}
+	  		bytesLeft-=bufferBytesRead;	//decrease the bytes left by the number read
 	  	}
-	  	return n-bytesLeft;	//return the number of bytes we skipped (captured), which will be the total number minus however many we have left to read, if any (if we reached the end of the stream, that is)
-		}
-		else	//if this is not something to debug
-		{
-			return super.skip(n);	//skip the data normally
-		}
+  	}
+  	return n-bytesLeft;	//return the number of bytes we skipped (captured), which will be the total number minus however many we have left to read, if any (if we reached the end of the stream, that is)
 	}
 	
 }

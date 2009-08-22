@@ -22,9 +22,7 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
-import com.globalmentor.collections.DecoratorReadWriteLockMap;
-import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
-import com.globalmentor.collections.ReadWriteLockMap;
+import com.globalmentor.collections.*;
 import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.AsynchronousWriter;
 import com.globalmentor.io.ByteOrderMark;
@@ -33,13 +31,13 @@ import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import com.globalmentor.text.W3CDateFormat;
-import com.globalmentor.util.*;
 
 /**Default implementation of a logger.
+<p>This implementation defaults to logging all levels of information.</p>
 <p>Multiple loggers can use the same file. Information is sent to the files asynchronously.</p>
 @author Garret Wilson
 */
-public class DefaultLogger implements Logger
+public class DefaultLogger extends AbstractLogger
 {
 
 	/**The map of writers keyed to files.
@@ -386,7 +384,7 @@ public class DefaultLogger implements Logger
 	@Override
 	public void warn(final Object... objects)
 	{
-		output(Log.Level.WARNING, objects);
+		output(Log.Level.WARN, objects);
 	}
 
 	/**{@inheritDoc}

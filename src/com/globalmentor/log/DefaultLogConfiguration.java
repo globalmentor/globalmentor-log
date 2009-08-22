@@ -25,7 +25,8 @@ import static com.globalmentor.java.Objects.*;
 /**The configuration for default logging.
 <p>The configuration will be used for creating new loggers; changing the configuration
 will not affect previously created loggers.</p>
-<p>This implementation allows the user of a common logger.</p>
+<p>This implementation by default configures new loggers to only log level {@link Log.Level#INFO} and above.</p>
+<p>This implementation allows the use of a common logger.</p>
 @author Garret Wilson
 @see DefaultLogger
 */
@@ -135,6 +136,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 
 	/**Default constructor.
 	Logging to the standard output will be enabled by default.
+	The log level defaults to {@link Log.Level#INFO} and above.
 	*/
 	public DefaultLogConfiguration()
 	{
@@ -143,24 +145,22 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 
 	/**File constructor.
 	If a file is given, logging to the standard output will default to disabled.
+	The log level defaults to {@link Log.Level#INFO} and above.
 	@param file The file to be used for logging, or <code>null</code> if no file is to be used.
 	*/
 	public DefaultLogConfiguration(final File file)
 	{
-		super(true);	//allow the use of a common logger
-		this.file=file;
-		setStandardOutput(file==null);	//by default turn off logging to the standard output if a writer was given
+		this(file, Log.Level.INFO);
 	}
 
 	/**Writer constructor.
 	If a writer is given, logging to the standard output will default to disabled.
+	The log level defaults to {@link Log.Level#INFO} and above.
 	@param writer The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.
 	*/
 	public DefaultLogConfiguration(final Writer writer)
 	{
-		super(true);	//allow the use of a common logger
-		this.writer=writer;
-		setStandardOutput(writer==null);	//by default turn off logging to the standard output if a writer was given
+		this(writer, Log.Level.INFO);
 	}
 
 	/**File and levels constructor.
@@ -183,7 +183,9 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	*/
 	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel)
 	{
-		this(file);
+		super(true);	//allow the use of a common logger
+		this.file=file;
+		setStandardOutput(file==null);	//by default turn off logging to the standard output if a writer was given
 		setLevel(minimumLevel);
 	}
 
@@ -207,7 +209,9 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	*/
 	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel)
 	{
-		this(writer);
+		super(true);	//allow the use of a common logger
+		this.writer=writer;
+		setStandardOutput(writer==null);	//by default turn off logging to the standard output if a writer was given
 		setLevel(minimumLevel);
 	}
 

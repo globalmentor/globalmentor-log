@@ -25,7 +25,7 @@ import static com.globalmentor.java.Throwables.*;
 	<dt>{@link Log.Level#TRACE}</dt> <dd>{@link java.util.logging.Level#FINE}</dd>
 	<dt>{@link Log.Level#DEBUG}</dt> <dd>{@link java.util.logging.Level#CONFIG}</dd>
 	<dt>{@link Log.Level#INFO}</dt> <dd>{@link java.util.logging.Level#INFO}</dd>
-	<dt>{@link Log.Level#WARNING}</dt> <dd>{@link java.util.logging.Level#WARNING}</dd>
+	<dt>{@link Log.Level#WARN}</dt> <dd>{@link java.util.logging.Level#WARNING}</dd>
 	<dt>{@link Log.Level#ERROR}</dt> <dd>{@link java.util.logging.Level#SEVERE}</dd>
 </dl>
 @author Garret Wilson
