@@ -149,7 +149,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	{
 		super(true);	//allow the use of a common logger
 		this.file=file;
-		setStandardOutput(file!=null);	//by default turn off logging to the standard output if a writer was given
+		setStandardOutput(file==null);	//by default turn off logging to the standard output if a writer was given
 	}
 
 	/**Writer constructor.
@@ -160,7 +160,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	{
 		super(true);	//allow the use of a common logger
 		this.writer=writer;
-		setStandardOutput(writer!=null);	//by default turn off logging to the standard output if a writer was given
+		setStandardOutput(writer==null);	//by default turn off logging to the standard output if a writer was given
 	}
 
 	/**File and levels constructor.
