@@ -317,11 +317,11 @@ public class DefaultLogger extends AbstractLogger
 		{
 			if(level==Log.Level.ERROR)	//if this is an error message
 			{
-				System.err.println(logString);
+				System.err.print(logString);
 			}
 			else	//if this is any other type of message
 			{
-				System.out.println(logString);
+				System.out.print(logString);
 			}
 		}
 	}
