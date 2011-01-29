@@ -47,7 +47,6 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger>
 	This method delegates to {@link org.apache.log4j.Logger#trace(Object)}
 	or {@link org.apache.log4j.Logger#trace(Object, Throwable)} as appropriate.
 	*/
-	@Override
 	public void trace(final Object... objects)
 	{
 		final Throwable throwable=getInstance(objects, Throwable.class);	//see if a throwable was given, so that we can give it explicitly to Log4j
@@ -64,7 +63,6 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger>
 
 	/**{@inheritDoc}
 	*/
-	@Override
 	public void traceStack(final Object... objects)
 	{
 		Throwable throwable=getInstance(objects, Throwable.class);	//see if a throwable was given, so that we can give it explicitly to log4j
@@ -79,7 +77,6 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger>
 	This method delegates to {@link org.apache.log4j.Logger#debug(Object)}
 	or {@link org.apache.log4j.Logger#debug(Object, Throwable)} as appropriate.
 	*/
-	@Override
 	public void debug(final Object... objects)
 	{
 		final Throwable throwable=getInstance(objects, Throwable.class);	//see if a throwable was given, so that we can give it explicitly to log4j
@@ -98,7 +95,6 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger>
 	This method delegates to {@link org.apache.log4j.Logger#info(Object)}
 	or {@link org.apache.log4j.Logger#info(Object, Throwable)} as appropriate.
 	*/
-	@Override
 	public void info(final Object... objects)
 	{
 		final Throwable throwable=getInstance(objects, Throwable.class);	//see if a throwable was given, so that we can give it explicitly to log4j
@@ -117,7 +113,6 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger>
 	This method delegates to {@link org.apache.log4j.Logger#warn(Object)}
 	or {@link org.apache.log4j.Logger#warn(Object, Throwable)} as appropriate.
 	*/
-	@Override
 	public void warn(final Object... objects)
 	{
 		final Throwable throwable=getInstance(objects, Throwable.class);	//see if a throwable was given, so that we can give it explicitly to log4j
@@ -136,7 +131,6 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger>
 	This method delegates to {@link org.apache.log4j.Logger#error(Object)}
 	or {@link org.apache.log4j.Logger#error(Object, Throwable)} as appropriate.
 	*/
-	@Override
 	public void error(final Object... objects)
 	{
 		final Throwable throwable=getInstance(objects, Throwable.class);	//see if a throwable was given, so that we can give it explicitly to log4j

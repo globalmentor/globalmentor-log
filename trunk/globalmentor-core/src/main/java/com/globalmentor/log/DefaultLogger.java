@@ -341,7 +341,6 @@ public class DefaultLogger extends AbstractLogger
 	/**{@inheritDoc}
 	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
-	@Override
 	public void trace(final Object... objects)
 	{
 		output(Log.Level.TRACE, objects);
@@ -350,7 +349,6 @@ public class DefaultLogger extends AbstractLogger
 	/**{@inheritDoc}
 	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
-	@Override
 	public void traceStack(final Object... objects)
 	{
 		if(objects.length>0)
@@ -363,7 +361,6 @@ public class DefaultLogger extends AbstractLogger
 	/**{@inheritDoc}
 	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
-	@Override
 	public void debug(final Object... objects)
 	{
 		output(Log.Level.DEBUG, objects);
@@ -372,7 +369,6 @@ public class DefaultLogger extends AbstractLogger
 	/**{@inheritDoc}
 	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
-	@Override
 	public void info(final Object... objects)
 	{
 		output(Log.Level.INFO, objects);
@@ -381,7 +377,6 @@ public class DefaultLogger extends AbstractLogger
 	/**{@inheritDoc}
 	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
-	@Override
 	public void warn(final Object... objects)
 	{
 		output(Log.Level.WARN, objects);
@@ -390,7 +385,6 @@ public class DefaultLogger extends AbstractLogger
 	/**{@inheritDoc}
 	This implementation generates a stack trace if an object is an instance of {@link Throwable}.
 	*/
-	@Override
 	public void error(final Object... objects)
 	{
 		output(Log.Level.ERROR, objects);

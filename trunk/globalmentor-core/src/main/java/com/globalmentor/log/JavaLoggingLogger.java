@@ -46,7 +46,6 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**{@inheritDoc}
 	This method delegates to {@link java.util.logging.Logger#fine(String)}.
 	*/
-	@Override
 	public void trace(final Object... objects)
 	{
 		getLogger().fine(concat(objects, ' '));
@@ -55,7 +54,6 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**{@inheritDoc}
 	This method delegates to {@link #trace(Object...)}.
 	*/
-	@Override
 	public void traceStack(final Object... objects)
 	{
 		if(objects.length>0)
@@ -68,7 +66,6 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**{@inheritDoc}
 	This method delegates to {@link java.util.logging.Logger#config(String)}.
 	*/
-	@Override
 	public void debug(final Object... objects)
 	{
 		getLogger().config(concat(objects, ' '));
@@ -77,7 +74,6 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**{@inheritDoc}
 	This method delegates to {@link java.util.logging.Logger#info(String)}.
 	*/
-	@Override
 	public void info(final Object... objects)
 	{
 		getLogger().info(concat(objects, ' '));
@@ -86,7 +82,6 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**{@inheritDoc}
 	This method delegates to {@link java.util.logging.Logger#warning(String)}.
 	*/
-	@Override
 	public void warn(final Object... objects)
 	{
 		getLogger().warning(concat(objects, ' '));
@@ -95,7 +90,6 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**{@inheritDoc}
 	This method delegates to {@link java.util.logging.Logger#severe(String)}.
 	*/
-	@Override
 	public void error(final Object... objects)
 	{
 		getLogger().severe(concat(objects, ' '));
