@@ -22,11 +22,7 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
-import com.globalmentor.collections.*;
 import com.globalmentor.config.ConfigurationException;
-import com.globalmentor.io.AsynchronousWriter;
-import com.globalmentor.io.ByteOrderMark;
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.OperatingSystem.*;
@@ -34,48 +30,11 @@ import com.globalmentor.text.W3CDateFormat;
 
 /**Default implementation of a logger.
 <p>This implementation defaults to logging all levels of information.</p>
-<p>Multiple loggers can use the same file. Information is sent to the files asynchronously.</p>
+<p>Multiple loggers can use the same file for the same configuration. Information is sent to the files asynchronously.</p>
 @author Garret Wilson
 */
 public class DefaultLogger extends AbstractLogger
 {
-
-	/**The map of writers keyed to files.
-	Writers will be released for garbage collection when no longer in use.
-	Code accessing this map should use its read/write lock.
-	*/
-	private final static ReadWriteLockMap<File, Writer> fileWriterMap=new DecoratorReadWriteLockMap<File, Writer>(new PurgeOnWriteSoftValueHashMap<File, Writer>());
-
-	/**Retrieves a writer to the given file.
-	Multiple processes may write the the same file using the returned writer.
-	@param file The file for which a writer should be returned.
-	@return The writer for writing information to the file.
-	@throws NullPointerException if the given file is <code>null</code>.
-	@throws IOException if there is an error getting a writer for the file.
-	*/
-	protected static Writer getWriter(final File file) throws IOException
-	{
-		Writer writer=fileWriterMap.get(file);	//see if we already have a writer for this file
-		if(writer==null)	//if we don't yet have a writer for this file
-		{
-			fileWriterMap.writeLock().lock();
-			try
-			{
-				writer=fileWriterMap.get(file);	//try again to get a writer for this file
-				if(writer==null)	//if we still don't have a writer for this file
-				{
-					final OutputStream outputStream=new FileOutputStream(file, true);	//create an output stream
-					outputStream.write(ByteOrderMark.UTF_8.getBytes());	//write the UTF-8 byte order mark
-					writer=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(outputStream), UTF_8_CHARSET));	//open an asynchronous, buffered writer for appending to the file in UTF-8
-				}
-			}
-			finally
-			{
-				fileWriterMap.writeLock().unlock();
-			}
-		}
-		return writer;
-	}
 
 	/**An object for formatting the date and time. This object is not thread safe and must be synchronized externally; in this implementation it is synchronized on itself.*/
 	protected static final DateFormat DATE_FORMAT=new W3CDateFormat(W3CDateFormat.Style.DATE_TIME);
@@ -150,6 +109,59 @@ public class DefaultLogger extends AbstractLogger
 		*/
 		public void setStandardOutput(final boolean standardOutput) {this.standardOutput=standardOutput;}
 
+	/**The owner log configuration; serves as a factor for new writers.*/
+	private final DefaultLogConfiguration logConfiguration;
+
+	/**@return The owner log configuration; serves as a factor for new writers.*/
+	public DefaultLogConfiguration getLogConfiguration() {return logConfiguration;}
+	
+	/**Log configuration constructor.
+	Information will be logged to the standard output {@link System#out}.
+	*/
+	public DefaultLogger(final DefaultLogConfiguration logConfiguration)
+	{
+		this(logConfiguration, (File)null, true);	//don't log to a file, but log to stdout
+	}
+
+	/**File constructor with no output to {@link System#out} or {@link System#err}.
+	@param file The file to use for logging, or <code>null</code> if no file logging should be used.
+	*/
+	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final File file)
+	{
+		this(logConfiguration, file, false);
+	}
+
+	/**File and log system out constructor.
+	@param file The file to use for logging, or <code>null</code> if no file logging should be used.
+	@param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
+	*/
+	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final File file, final boolean standardOutput)
+	{
+		this.logConfiguration=checkInstance(logConfiguration, "Log configuration must be provided.");
+		this.file=file;	//save the file, if any
+		this.standardOutput=standardOutput;
+	}
+
+	/**Writer constructor with no output to {@link System#out} or {@link System#err}.
+	@param writer The writer to use for logging.
+	@throws NullPointerException if the given writer is <code>null</code>.
+	*/
+	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final Writer writer)
+	{
+		this(logConfiguration, writer, false);
+	}
+
+	/**Writer and log system out constructor.
+	@param writer The writer to use for logging.
+	@param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
+	@throws NullPointerException if the given writer is <code>null</code>.
+	*/
+	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final Writer writer, final boolean standardOutput)
+	{
+		this(logConfiguration, (File)null, standardOutput);	//construct the class with no file 
+		this.writer=checkInstance(writer, "Writer cannot be null.");
+	}
+
 	/**Returns the writer, if any, used to log information.
 	This implementation lazily determines and caches the writer if appropriate.
 	@return The writer used to log information, or <code>null</code> if information should not be logged to a writer.
@@ -163,7 +175,7 @@ public class DefaultLogger extends AbstractLogger
 			{
 				try
 				{
-					writer=getWriter(file);	//get a writer for this file
+					writer=getLogConfiguration().getWriter(file);	//get a writer for this file
 				}
 				catch(final IOException ioException)
 				{
@@ -173,53 +185,7 @@ public class DefaultLogger extends AbstractLogger
 		}
 		return writer;	//return the writer
 	}
-
-	/**Default constructor.
-	Information will be logged to the standard output {@link System#out}.
-	*/
-	public DefaultLogger()
-	{
-		this((File)null, true);	//don't log to a file, but log to stdout
-	}
-
-	/**File constructor with no output to {@link System#out} or {@link System#err}.
-	@param file The file to use for logging, or <code>null</code> if no file logging should be used.
-	*/
-	public DefaultLogger(final File file)
-	{
-		this(file, false);
-	}
-
-	/**File and log system out constructor.
-	@param file The file to use for logging, or <code>null</code> if no file logging should be used.
-	@param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
-	*/
-	public DefaultLogger(final File file, final boolean standardOutput)
-	{
-		this.file=file;	//save the file, if any
-		this.standardOutput=standardOutput;
-	}
-
-	/**Writer constructor with no output to {@link System#out} or {@link System#err}.
-	@param writer The writer to use for logging.
-	@throws NullPointerException if the given writer is <code>null</code>.
-	*/
-	public DefaultLogger(final Writer writer)
-	{
-		this(writer, false);
-	}
-
-	/**Writer and log system out constructor.
-	@param writer The writer to use for logging.
-	@param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
-	@throws NullPointerException if the given writer is <code>null</code>.
-	*/
-	public DefaultLogger(final Writer writer, final boolean standardOutput)
-	{
-		this((File)null, standardOutput);	//construct the class with no file 
-		this.writer=checkInstance(writer, "Writer cannot be null.");
-	}
-
+	
 	/**Appends a stack trace to a string builder, including any recursive causes.
 	@param stringBuilder The string builder to retrieve the stack trace.
 	@param throwable The source of the stack trace, not including any source inside this class.

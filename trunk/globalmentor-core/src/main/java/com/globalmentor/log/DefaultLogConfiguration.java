@@ -18,8 +18,13 @@ package com.globalmentor.log;
 
 import java.io.*;
 import java.util.*;
+
+import com.globalmentor.collections.*;
+import com.globalmentor.io.*;
+
 import static java.util.Collections.*;
 
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 
 /**The configuration for default logging.
@@ -103,6 +108,74 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 		this.file=file;
 	}
 
+	/**The map of writers keyed to files.
+	//TODO del of not wanted; currently we need the writers to be able to close then: Writers will be released for garbage collection when no longer in use.
+	Code accessing this map should use its read/write lock.
+	*/
+	private final ReadWriteLockMap<File, Writer> fileWriterMap=new DecoratorReadWriteLockMap<File, Writer>(new HashMap<File, Writer>());
+
+	/**Retrieves a writer to the given file.
+	Multiple processes may write the the same file using the returned writer.
+	@param file The file for which a writer should be returned.
+	@return The writer for writing information to the file.
+	@throws NullPointerException if the given file is <code>null</code>.
+	@throws IOException if there is an error getting a writer for the file.
+	*/
+	protected Writer getWriter(final File file) throws IOException
+	{
+		Writer writer=fileWriterMap.get(file);	//see if we already have a writer for this file
+		if(writer==null)	//if we don't yet have a writer for this file
+		{
+			fileWriterMap.writeLock().lock();
+			try
+			{
+				writer=fileWriterMap.get(file);	//try again to get a writer for this file
+				if(writer==null)	//if we still don't have a writer for this file
+				{
+					final OutputStream outputStream=new FileOutputStream(file, true);	//create an output stream
+					outputStream.write(ByteOrderMark.UTF_8.getBytes());	//write the UTF-8 byte order mark
+					writer=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(outputStream), UTF_8_CHARSET));	//open an asynchronous, buffered writer for appending to the file in UTF-8
+					fileWriterMap.put(file, writer);	//associate the writer in the map so that we can use it next time
+				}
+			}
+			finally
+			{
+				fileWriterMap.writeLock().unlock();
+			}
+		}
+		return writer;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * This version closes all the writers that have been opened with this configuration.
+	 * This implementation writes a message to {@link System#out} if there is an error. 
+	 */
+	@Override
+	public void dispose()
+	{
+		super.dispose();
+		fileWriterMap.readLock().lock();
+		try
+		{
+			for(final Writer writer:fileWriterMap.values())
+			{
+				try
+				{
+					writer.close();
+				}
+				catch(final IOException ioException)
+				{
+					System.out.println("Error closing log writer; "+ioException.getMessage());
+				}
+			}
+		}
+		finally
+		{
+			fileWriterMap.readLock().unlock();
+		}
+	}
+	
 	/**The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.*/
 	private Writer writer=null;
 
@@ -283,7 +356,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	public Logger createLogger(final Class<?> objectClass)
 	{
 		final Writer writer=getWriter();	//see if we have a writer specified
-		final DefaultLogger logger=writer!=null ? new DefaultLogger(writer) : new DefaultLogger(getFile());	//configure the logger with a writer or file (the latter of which may be null)
+		final DefaultLogger logger=writer!=null ? new DefaultLogger(this, writer) : new DefaultLogger(this, getFile());	//configure the logger with a writer or file (the latter of which may be null)
 		logger.setStandardOutput(isStandardOutput());	//set whether the standard output should be used
 		logger.setLevels(getLevels());	//set the levels to report
 		logger.setReport(getReport());	//set the information to report

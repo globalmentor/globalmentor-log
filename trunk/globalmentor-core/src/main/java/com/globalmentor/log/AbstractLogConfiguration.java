@@ -19,6 +19,8 @@ package com.globalmentor.log;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.globalmentor.config.AbstractConfiguration;
+
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
@@ -30,7 +32,7 @@ It is assumed that it is benign if multiple loggers get created temporarily for 
 @param <K> The type of key with which loggers are associated.
 @author Garret Wilson
 */
-public abstract class AbstractLogConfiguration<K> implements LogConfiguration
+public abstract class AbstractLogConfiguration<K> extends AbstractConfiguration implements LogConfiguration
 {
 
 	/**Whether a common logger is used if no specific logger registrations have yet been made.*/
