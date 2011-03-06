@@ -166,7 +166,8 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 				}
 				catch(final IOException ioException)
 				{
-					System.out.println("Error closing log writer; "+ioException.getMessage());
+					System.err.println("Error closing log writer; "+ioException.getMessage());
+					ioException.printStackTrace();
 				}
 			}
 		}
