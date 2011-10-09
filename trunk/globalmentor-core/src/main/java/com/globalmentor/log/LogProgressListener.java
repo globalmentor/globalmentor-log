@@ -80,10 +80,11 @@ public class LogProgressListener implements ProgressListener
 			final long percent = value * 100 / maximum; //0-100
 			final String percentString = makeStringLength(Long.toString(percent), 3, ' ', 0); //pad the percent with spaces so they will align
 			stringBuilder.append(' ').append(percentString).append('%').append(' ').append(logString); // 23% (123/1000)
-			if(value < maximum) //if we haven't finished with progress
+			if(value == maximum) //if we finished with progress
 			{
-				stringBuilder.append(CARRIAGE_RETURN_CHAR); //add a carriage return so that a linefeed won't be automatically appended, allowing us to update the same line over and over for the progress bar
+				stringBuilder.append(LINE_FEED_CHAR); //skip to the next line; we're finished with the progress update
 			}
+			stringBuilder.append(CARRIAGE_RETURN_CHAR); //add a carriage return so that a linefeed won't be automatically appended, allowing us to update the same line over and over for the progress bar
 			logString = stringBuilder.toString(); //replace the log string with the expanded, progress bar version
 		}
 		Log.info(logString);
