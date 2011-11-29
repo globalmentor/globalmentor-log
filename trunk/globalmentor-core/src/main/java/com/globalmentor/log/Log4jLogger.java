@@ -16,7 +16,7 @@
 
 package com.globalmentor.log;
 
-import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Strings.*;
 
 /**A logger that delegates to a Java logger.
