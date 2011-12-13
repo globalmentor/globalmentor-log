@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2009-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,6 +217,26 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 		this((File)null);
 	}
 
+	/**Levels constructor.
+	@param levels The levels that will be logged.
+	@throws NullPointerException if the given levels is <code>null</code>.
+	*/
+	public DefaultLogConfiguration(final Set<Log.Level> levels)
+	{
+		this();
+		setLevels(levels);
+	}
+	
+	/**Minimum level constructor.
+	@param minimumLevel The minimum level that will be logged.
+	@throws NullPointerException if the given level is <code>null</code>.
+	*/
+	public DefaultLogConfiguration(final Log.Level minimumLevel)
+	{
+		this();
+		setLevel(minimumLevel);
+	}
+	
 	/**File constructor.
 	If a file is given, logging to the standard output will default to disabled.
 	The log level defaults to {@link Log.Level#INFO} and above.
