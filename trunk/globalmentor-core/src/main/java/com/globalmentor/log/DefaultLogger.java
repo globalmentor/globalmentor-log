@@ -1,5 +1,5 @@
 /*
- * Copyright © 1996-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,10 @@ import com.globalmentor.config.ConfigurationException;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.OperatingSystem.*;
+import static com.globalmentor.java.Threads.*;
+
 import com.globalmentor.text.W3CDateFormat;
 
 /**
@@ -295,12 +296,12 @@ public class DefaultLogger extends AbstractLogger
 			stringBuilder.append(' '); //append a space
 			stringBuilder.append(getCallingClassStackTraceElement(Log.class)); //append the program location (ignoring the Log class, which might have been used for its convenience methods)
 		}
-		int prefaceLength=stringBuilder.length();	//find out how much the preface information is, in case we want to remove it later
+		int prefaceLength = stringBuilder.length(); //find out how much the preface information is, in case we want to remove it later
 		if(objects.length > 0) //if there are objects to output
 		{
 			stringBuilder.append(' '); //append a space
 			stringBuilder.append(':'); //append a colon
-			prefaceLength=stringBuilder.length()+1;	//for objects, we add additional preface characters (including the first space we add below)
+			prefaceLength = stringBuilder.length() + 1; //for objects, we add additional preface characters (including the first space we add below)
 			for(final Object object : objects) //for each object
 			{
 				stringBuilder.append(' '); //append a space
@@ -317,9 +318,10 @@ public class DefaultLogger extends AbstractLogger
 		}
 		if(endsWith(stringBuilder, CARRIAGE_RETURN_CHAR)) //if the line ends with '\r', it means the caller wants to control its own line breaks---and do without the preface
 		{
-			stringBuilder.delete(0, prefaceLength);	//remove the preface altogether
+			stringBuilder.delete(0, prefaceLength); //remove the preface altogether
 		}
-		else	//if the line doesn't end with '\r', log it normally
+		else
+		//if the line doesn't end with '\r', log it normally
 		{
 			stringBuilder.append(LINE_SEPARATOR); //append the end-of-line character(s)
 		}

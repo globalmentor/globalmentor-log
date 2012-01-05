@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.globalmentor.config.AbstractConfiguration;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.java.Threads.*;
 
 /**An abstract base implementation of logging configuration.
 <p>This implementation uses a concurrent map which is thread-safe but still allows race conditions.
