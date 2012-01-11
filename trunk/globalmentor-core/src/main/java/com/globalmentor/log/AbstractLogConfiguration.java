@@ -20,10 +20,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.globalmentor.config.AbstractConfiguration;
+import com.globalmentor.java.StackTrace;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.java.Threads.*;
 
 /**An abstract base implementation of logging configuration.
 <p>This implementation uses a concurrent map which is thread-safe but still allows race conditions.
@@ -136,7 +136,7 @@ public abstract class AbstractLogConfiguration<K> extends AbstractConfiguration 
 		{
 			return determineCommonLogger();	//return the common logger, creating it if necessary
 		}
-		return getLogger(getCallingClass(Log.class));	//get a logger for the class calling this class (ignoring the Log class, which might have been used for its convenience methods)
+		return getLogger(StackTrace.getCallingClass(Log.class.getPackage()));	//get a logger for the class calling this class (ignoring the entire logging package, which might have been used for its convenience methods)
 	}
 
 	/**Retrieves the appropriate logger for the given class.

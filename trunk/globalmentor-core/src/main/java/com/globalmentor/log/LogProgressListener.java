@@ -1,5 +1,5 @@
 /*
- * Copyright © 1996-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 1996-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 package com.globalmentor.log;
 
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Strings.makeStringLength;
+import static com.globalmentor.java.Strings.*;
 
 import com.globalmentor.event.*;
-import com.globalmentor.java.Strings;
 
 /**
  * A progress listener that logs any progress reported. If a progress bar is included, the progress logged will include controlled carriage returns to allow
@@ -84,9 +83,9 @@ public class LogProgressListener implements ProgressListener
 			{
 				stringBuilder.append(LINE_FEED_CHAR); //skip to the next line; we're finished with the progress update
 			}
-			stringBuilder.append(CARRIAGE_RETURN_CHAR); //add a carriage return so that a linefeed won't be automatically appended, allowing us to update the same line over and over for the progress bar
+			stringBuilder.append(CARRIAGE_RETURN_CHAR); //add a carriage return so that the next update will overwrite this one, allowing us to update the same line over and over for the progress bar
 			logString = stringBuilder.toString(); //replace the log string with the expanded, progress bar version
 		}
-		Log.info(logString);
+		Log.info(Log.RAW_FLAG, logString); //log the information, indicating that want to control our own line breaks and have no prefix
 	}
 }

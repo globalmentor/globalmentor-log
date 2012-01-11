@@ -23,12 +23,11 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.config.ConfigurationException;
+import com.globalmentor.java.StackTrace;
 
-import static com.globalmentor.java.CharSequences.*;
-import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.OperatingSystem.*;
-import static com.globalmentor.java.Threads.*;
+import static com.globalmentor.log.Log.*;
 
 import com.globalmentor.text.W3CDateFormat;
 
@@ -41,8 +40,9 @@ import com.globalmentor.text.W3CDateFormat;
  * Multiple loggers can use the same file for the same configuration. Information is sent to the files asynchronously.
  * </p>
  * <p>
- * This implementation allows for same-line updates; if a line ends with '\r', it is assumed that the caller wants to control its own line breaks, so no
- * additional line separator is added, allowing the implementation of progress bars, for example.
+ * The {@link Log#RAW_FLAG}, if present at the beginning of a sequence of log objects, indicates that the log text should be interpreted as literal, raw data
+ * with no preface or control characters. This allows the caller wants to control its own line breaks so that no additional line separator is added, allowing
+ * the implementation of progress bars, for example.
  * </p>
  * @author Garret Wilson
  */
@@ -294,17 +294,29 @@ public class DefaultLogger extends AbstractLogger
 		if(report.contains(Log.Report.LOCATION)) //if we should report the program location
 		{
 			stringBuilder.append(' '); //append a space
-			stringBuilder.append(getCallingClassStackTraceElement(Log.class)); //append the program location (ignoring the Log class, which might have been used for its convenience methods)
+			stringBuilder.append(StackTrace.getCallingStackTraceElement(Log.class.getPackage())); //append the program location (ignoring everything in this package, which might have been used for its convenience methods)
 		}
 		int prefaceLength = stringBuilder.length(); //find out how much the preface information is, in case we want to remove it later
-		if(objects.length > 0) //if there are objects to output
+		boolean isRaw = false; //we'll look for the raw flag
+		int objectCount = 0;
+		for(final Object object : objects) //for each object
 		{
-			stringBuilder.append(' '); //append a space
-			stringBuilder.append(':'); //append a colon
-			prefaceLength = stringBuilder.length() + 1; //for objects, we add additional preface characters (including the first space we add below)
-			for(final Object object : objects) //for each object
+			if(RAW_FLAG.equals(object)) //if this is the raw flag
 			{
-				stringBuilder.append(' '); //append a space
+				isRaw = true; //turn on raw output
+			}
+			else
+			{
+				if(objectCount == 0) //if we haven't appended any objects yet
+				{
+					stringBuilder.append(' '); //append a space
+					stringBuilder.append(':'); //append a colon
+					prefaceLength = stringBuilder.length(); //update the length of our preface
+				}
+				if(!isRaw) //if this is not raw output
+				{
+					stringBuilder.append(' '); //append a space as a separator between the objects
+				}
 				if(object instanceof Throwable) //if this is a throwable object
 				{
 					appendStackTrace(stringBuilder, (Throwable)object); //append a stack trace
@@ -312,16 +324,17 @@ public class DefaultLogger extends AbstractLogger
 				else
 				//if this is not a throwable object
 				{
-					stringBuilder.append(object); //append this object's string value with a separator
+					stringBuilder.append(object); //append this object's string value
 				}
+				++objectCount; //indicate that we have another object
 			}
 		}
-		if(endsWith(stringBuilder, CARRIAGE_RETURN_CHAR)) //if the line ends with '\r', it means the caller wants to control its own line breaks---and do without the preface
+		if(isRaw) //if the caller wants to control its own line breaks---and do without the preface
 		{
 			stringBuilder.delete(0, prefaceLength); //remove the preface altogether
 		}
 		else
-		//if the line doesn't end with '\r', log it normally
+		//if the line doesn't have the raw flag, log it normally
 		{
 			stringBuilder.append(LINE_SEPARATOR); //append the end-of-line character(s)
 		}
