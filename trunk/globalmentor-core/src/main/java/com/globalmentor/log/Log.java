@@ -19,6 +19,7 @@ package com.globalmentor.log;
 import static com.globalmentor.java.Characters.*;
 
 import com.globalmentor.config.Configurator;
+import com.globalmentor.lex.Identifier;
 
 /**
  * Central class for controlling logging.
@@ -50,7 +51,7 @@ public final class Log
 	}
 
 	/** The available logging levels. */
-	public enum Level
+	public enum Level implements Identifier
 	{
 		/** Indicates the program's execution path. */
 		TRACE,
@@ -65,7 +66,7 @@ public final class Log
 	};
 
 	/** The available reporting options. */
-	public enum Report
+	public enum Report implements Identifier
 	{
 		/** Indicates that the log level should be reported. */
 		LEVEL,
