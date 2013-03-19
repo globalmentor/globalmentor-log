@@ -16,11 +16,11 @@
 
 package com.globalmentor.test;
 
-import com.globalmentor.log.*;
-
 //import static org.hamcrest.CoreMatchers.*;
 //import static org.junit.Assert.*;
 //import org.junit.Test;
+
+import com.globalmentor.log.*;
 
 /**
  * An abstract base class for tests.
