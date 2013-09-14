@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2011-2013 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.globalmentor.test;
 
-//import static org.hamcrest.CoreMatchers.*;
+//import static org.hamcrest.Matchers.*;
 //import static org.junit.Assert.*;
 //import org.junit.Test;
 
