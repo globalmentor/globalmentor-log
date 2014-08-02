@@ -37,7 +37,7 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream>
 	/**
 	 * Decorates the given output stream with a report level of {@link Log.Level#INFO}.
 	 * @param outputStream The output stream to decorate.
-	 * @exception NullPointerException if the given stream is <code>null</code>.
+	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
 	public LogOutputStream(final OutputStream outputStream)
 	{
@@ -47,7 +47,7 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream>
 	/**
 	 * Decorates the given output stream.
 	 * @param outputStream The output stream to decorate.
-	 * @exception NullPointerException if the given stream and/or log level is <code>null</code>.
+	 * @throws NullPointerException if the given stream and/or log level is <code>null</code>.
 	 */
 	public LogOutputStream(final OutputStream outputStream, final Log.Level logLevel)
 	{

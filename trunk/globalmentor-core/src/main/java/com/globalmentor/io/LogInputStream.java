@@ -42,7 +42,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 	/**
 	 * Decorates the given input stream with a log level of {@link Log.LEVEL#INFO}.
 	 * @param inputStream The input stream to decorate.
-	 * @exception NullPointerException if the given stream is <code>null</code>.
+	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
 	public LogInputStream(final InputStream inputStream)
 	{
@@ -52,7 +52,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 	/**
 	 * Decorates the given input stream.
 	 * @param inputStream The input stream to decorate.
-	 * @exception NullPointerException if the given stream and/or log level is <code>null</code>.
+	 * @throws NullPointerException if the given stream and/or log level is <code>null</code>.
 	 */
 	public LogInputStream(final InputStream inputStream, final Log.Level logLevel)
 	{
