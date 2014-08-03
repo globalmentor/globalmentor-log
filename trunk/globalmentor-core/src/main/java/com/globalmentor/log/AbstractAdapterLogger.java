@@ -18,26 +18,28 @@ package com.globalmentor.log;
 
 import static com.globalmentor.java.Objects.*;
 
-/**A logger that delegates to another type of logger.
-@param <L> The type of delegate logger.
-@author Garret Wilson
-*/
-public abstract class AbstractAdapterLogger<L> extends AbstractLogger
-{
+/**
+ * A logger that delegates to another type of logger.
+ * @param <L> The type of delegate logger.
+ * @author Garret Wilson
+ */
+public abstract class AbstractAdapterLogger<L> extends AbstractLogger {
 
-	/**The logger delegate.*/
+	/** The logger delegate. */
 	private L logger;
 
-		/**@return The logger delegate.*/
-		protected L getLogger() {return logger;}
+	/** @return The logger delegate. */
+	protected L getLogger() {
+		return logger;
+	}
 
-	/**Decorated constructor.
-	@param logger The logger delegate.
-	@throws NullPointerException if the given logger is <code>null</code>.
-	*/
-	public AbstractAdapterLogger(final L logger)
-	{
-		this.logger=checkInstance(logger, "Logger cannot be null.");
+	/**
+	 * Decorated constructor.
+	 * @param logger The logger delegate.
+	 * @throws NullPointerException if the given logger is <code>null</code>.
+	 */
+	public AbstractAdapterLogger(final L logger) {
+		this.logger = checkInstance(logger, "Logger cannot be null.");
 	}
 
 }

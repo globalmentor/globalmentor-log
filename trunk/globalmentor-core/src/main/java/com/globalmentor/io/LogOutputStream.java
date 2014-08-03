@@ -28,8 +28,7 @@ import com.globalmentor.log.Log;
  * @author Garret Wilson
  * @see Log
  */
-public class LogOutputStream extends OutputStreamDecorator<OutputStream>
-{
+public class LogOutputStream extends OutputStreamDecorator<OutputStream> {
 
 	/** The log level to use. */
 	private final Log.Level logLevel;
@@ -39,8 +38,7 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream>
 	 * @param outputStream The output stream to decorate.
 	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
-	public LogOutputStream(final OutputStream outputStream)
-	{
+	public LogOutputStream(final OutputStream outputStream) {
 		this(outputStream, Log.Level.INFO);
 	}
 
@@ -49,39 +47,34 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream>
 	 * @param outputStream The output stream to decorate.
 	 * @throws NullPointerException if the given stream and/or log level is <code>null</code>.
 	 */
-	public LogOutputStream(final OutputStream outputStream, final Log.Level logLevel)
-	{
+	public LogOutputStream(final OutputStream outputStream, final Log.Level logLevel) {
 		super(outputStream); //construct the parent class
 		this.logLevel = checkInstance(logLevel, "Log level cannot be null.");
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void write(int b) throws IOException
-	{
+	public void write(int b) throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, Character.valueOf((char)b));
 		super.write(b); //do the default writing
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void write(byte b[]) throws IOException
-	{
+	public void write(byte b[]) throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, new String(b, US_ASCII_CHARSET));
 		super.write(b); //do the default writing
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void write(byte b[], int off, int len) throws IOException
-	{
+	public void write(byte b[], int off, int len) throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, new String(b, off, len, US_ASCII_CHARSET));
 		super.write(b, off, len); //do the default writing
 	}
 
 	@Override
-	protected void beforeClose() throws IOException
-	{
+	protected void beforeClose() throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, END_OF_TRANSMISSION_SYMBOL); //EOT
 		super.beforeClose();
 	}

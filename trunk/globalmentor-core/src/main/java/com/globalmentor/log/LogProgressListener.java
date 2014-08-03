@@ -29,23 +29,20 @@ import com.globalmentor.event.*;
  * 
  * @see Log#info(Object...)
  */
-public class LogProgressListener implements ProgressListener
-{
+public class LogProgressListener implements ProgressListener {
 
 	/** Whether a progress bar should be included in the log if possible. */
 	private final boolean progressBarLogged;
 
 	/** @return Whether a progress bar should be included in the log if possible. */
-	public boolean isProgressBarLogged()
-	{
+	public boolean isProgressBarLogged() {
 		return progressBarLogged;
 	}
 
 	/**
 	 * Default constructor with progress bar included.
 	 */
-	public LogProgressListener()
-	{
+	public LogProgressListener() {
 		this(true);
 	}
 
@@ -53,8 +50,7 @@ public class LogProgressListener implements ProgressListener
 	 * Progress bar constructor.
 	 * @param progressBarLogged Whether a progress bar should be included in the log.
 	 */
-	public LogProgressListener(final boolean progressBarLogged)
-	{
+	public LogProgressListener(final boolean progressBarLogged) {
 		this.progressBarLogged = progressBarLogged;
 	}
 
@@ -66,21 +62,18 @@ public class LogProgressListener implements ProgressListener
 	 * @see #isProgressBarLogged()
 	 * @see Log#info(Object...)
 	 */
-	public void progressed(final ProgressEvent progressEvent)
-	{
+	public void progressed(final ProgressEvent progressEvent) {
 		String logString = progressEvent.toString(); //start with the default progress event
 		final long value = progressEvent.getValue();
 		final long maximum = progressEvent.getMaximum();
-		if(isProgressBarLogged() && value >= 0 && maximum >= 0) //if we should and can show a progress bar 
-		{
+		if(isProgressBarLogged() && value >= 0 && maximum >= 0) { //if we should and can show a progress bar 
 			final int completeLogStringLength = new ProgressEvent(progressEvent.getSource(), maximum, maximum).toString().length() + 2; //see how long the log string would be when the activity is complete (counting parentheses)
 			logString = makeStringLength("(" + logString + ")", completeLogStringLength, ' ', 0); //add parentheses pad the log string so it will align with the finished log string
 			final StringBuilder stringBuilder = new StringBuilder(progressEvent.getProgressBarString()); //XX........
 			final long percent = value * 100 / maximum; //0-100
 			final String percentString = makeStringLength(Long.toString(percent), 3, ' ', 0); //pad the percent with spaces so they will align
 			stringBuilder.append(' ').append(percentString).append('%').append(' ').append(logString); // 23% (123/1000)
-			if(value == maximum) //if we finished with progress
-			{
+			if(value == maximum) { //if we finished with progress
 				stringBuilder.append(LINE_FEED_CHAR); //skip to the next line; we're finished with the progress update
 			}
 			stringBuilder.append(CARRIAGE_RETURN_CHAR); //add a carriage return so that the next update will overwrite this one, allowing us to update the same line over and over for the progress bar

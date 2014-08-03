@@ -33,8 +33,7 @@ import com.globalmentor.lex.Identifier;
  * </p>
  * @author Garret Wilson
  */
-public final class Log
-{
+public final class Log {
 
 	/** The common name extension for log files. */
 	public final static String NAME_EXTENSION = "log";
@@ -45,14 +44,12 @@ public final class Log
 	/** The initial flag that the log text should be interpreted as literal, raw data with no preface or control characters. */
 	public final static Character RAW_FLAG = Character.valueOf(RAW_FLAG_CHAR);
 
-	static
-	{
+	static {
 		setDefaultConfiguration(new DefaultLogConfiguration()); //install a default log configuration using stdout/err
 	}
 
 	/** The available logging levels. */
-	public enum Level implements Identifier
-	{
+	public enum Level implements Identifier {
 		/** Indicates the program's execution path. */
 		TRACE,
 		/** Indicates useful information, usually verbose. */
@@ -66,8 +63,7 @@ public final class Log
 	};
 
 	/** The available reporting options. */
-	public enum Report implements Identifier
-	{
+	public enum Report implements Identifier {
 		/** Indicates that the log level should be reported. */
 		LEVEL,
 		/** Indicates that execution time should be reported. */
@@ -86,8 +82,7 @@ public final class Log
 	 * @return The default log configuration.
 	 * @see Configurator#getDefaultConfiguration(Class)
 	 */
-	public static LogConfiguration getDefaultConfiguration()
-	{
+	public static LogConfiguration getDefaultConfiguration() {
 		return Configurator.getDefaultConfiguration(LogConfiguration.class);
 	}
 
@@ -98,8 +93,7 @@ public final class Log
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
 	 * @see Configurator#setDefaultConfiguration(Class)
 	 */
-	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration)
-	{
+	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration) {
 		return Configurator.setDefaultConfiguration(LogConfiguration.class, logConfiguration);
 	}
 
@@ -111,8 +105,7 @@ public final class Log
 	 * @return The configured log configuration for the current context.
 	 * @see Configurator#getConfiguration(Class)
 	 */
-	public static LogConfiguration getConfiguration()
-	{
+	public static LogConfiguration getConfiguration() {
 		return Configurator.getConfiguration(LogConfiguration.class);
 	}
 
@@ -123,8 +116,7 @@ public final class Log
 	 * </p>
 	 * @return An appropriate logger for the current circumstances.
 	 */
-	public static Logger getLogger()
-	{
+	public static Logger getLogger() {
 		return getConfiguration().getLogger();
 	}
 
@@ -134,8 +126,7 @@ public final class Log
 	 * @return The logger configured for the given class.
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 */
-	public static Logger getLogger(final Class<?> objectClass)
-	{
+	public static Logger getLogger(final Class<?> objectClass) {
 		return getConfiguration().getLogger(objectClass);
 	}
 
@@ -147,8 +138,7 @@ public final class Log
 	 * @param objects The objects to log.
 	 * @see Log.Level#TRACE
 	 */
-	public static void trace(final Object... objects)
-	{
+	public static void trace(final Object... objects) {
 		getConfiguration().getLogger().trace(objects);
 	}
 
@@ -162,8 +152,7 @@ public final class Log
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @see Log.Level#TRACE
 	 */
-	public static void trace(final Class<?> objectClass, final Object... objects)
-	{
+	public static void trace(final Class<?> objectClass, final Object... objects) {
 		getConfiguration().getLogger(objectClass).trace(objects);
 	}
 
@@ -178,8 +167,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @see Log.Level#TRACE
 	 */
-	public static void traceStack(final Object... objects)
-	{
+	public static void traceStack(final Object... objects) {
 		getConfiguration().getLogger().traceStack(objects);
 	}
 
@@ -196,8 +184,7 @@ public final class Log
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @see Log.Level#TRACE
 	 */
-	public static void traceStack(final Class<?> objectClass, final Object... objects)
-	{
+	public static void traceStack(final Class<?> objectClass, final Object... objects) {
 		getConfiguration().getLogger(objectClass).traceStack(objects);
 	}
 
@@ -209,8 +196,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @see Log.Level#DEBUG
 	 */
-	public static void debug(final Object... objects)
-	{
+	public static void debug(final Object... objects) {
 		getConfiguration().getLogger().debug(objects);
 	}
 
@@ -224,8 +210,7 @@ public final class Log
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @see Log.Level#DEBUG
 	 */
-	public static void debug(final Class<?> objectClass, final Object... objects)
-	{
+	public static void debug(final Class<?> objectClass, final Object... objects) {
 		getConfiguration().getLogger(objectClass).debug(objects);
 	}
 
@@ -237,8 +222,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @see Log.Level#INFO
 	 */
-	public static void info(final Object... objects)
-	{
+	public static void info(final Object... objects) {
 		getConfiguration().getLogger().info(objects);
 	}
 
@@ -252,8 +236,7 @@ public final class Log
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @see Log.Level#INFO
 	 */
-	public static void info(final Class<?> objectClass, final Object... objects)
-	{
+	public static void info(final Class<?> objectClass, final Object... objects) {
 		getConfiguration().getLogger(objectClass).info(objects);
 	}
 
@@ -266,8 +249,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @see Log.Level#WARN
 	 */
-	public static void warn(final Object... objects)
-	{
+	public static void warn(final Object... objects) {
 		getConfiguration().getLogger().warn(objects);
 	}
 
@@ -282,8 +264,7 @@ public final class Log
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @see Log.Level#WARN
 	 */
-	public static void warn(final Class<?> objectClass, final Object... objects)
-	{
+	public static void warn(final Class<?> objectClass, final Object... objects) {
 		getConfiguration().getLogger(objectClass).warn(objects);
 	}
 
@@ -295,8 +276,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @see Log.Level#ERROR
 	 */
-	public static void error(final Object... objects)
-	{
+	public static void error(final Object... objects) {
 		getConfiguration().getLogger().error(objects);
 	}
 
@@ -310,8 +290,7 @@ public final class Log
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @see Log.Level#ERROR
 	 */
-	public static void error(final Class<?> objectClass, final Object... objects)
-	{
+	public static void error(final Class<?> objectClass, final Object... objects) {
 		getConfiguration().getLogger(objectClass).error(objects);
 	}
 
@@ -321,8 +300,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @throws NullPointerException if the given log level is <code>null</code>.
 	 */
-	public static void log(final Log.Level level, final Object... objects)
-	{
+	public static void log(final Log.Level level, final Object... objects) {
 		getConfiguration().getLogger().log(level, objects);
 	}
 
@@ -333,8 +311,7 @@ public final class Log
 	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
 	 * @throws NullPointerException if the given object class and/or log level is <code>null</code>.
 	 */
-	public static void log(final Class<?> objectClass, final Log.Level level, final Object... objects)
-	{
+	public static void log(final Class<?> objectClass, final Log.Level level, final Object... objects) {
 		getConfiguration().getLogger(objectClass).log(level, objects);
 	}
 

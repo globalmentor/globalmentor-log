@@ -41,8 +41,7 @@ import static com.globalmentor.java.Objects.*;
  * @author Garret Wilson
  * @see DefaultLogger
  */
-public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
-{
+public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration {
 
 	/** The levels that should be logged. */
 	private Set<Log.Level> levels = unmodifiableSet(EnumSet.allOf(Log.Level.class));
@@ -51,8 +50,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * Returns the levels that should be logged. Defaults to all available levels.
 	 * @return The levels that will be logged.
 	 */
-	public Set<Log.Level> getLevels()
-	{
+	public Set<Log.Level> getLevels() {
 		return levels;
 	}
 
@@ -61,8 +59,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param levels The levels that will be logged.
 	 * @throws NullPointerException if the given levels is <code>null</code>.
 	 */
-	public void setLevels(final Set<Log.Level> levels)
-	{
+	public void setLevels(final Set<Log.Level> levels) {
 		this.levels = unmodifiableSet(EnumSet.copyOf(checkInstance(levels, "Levels cannot be null.")));
 	}
 
@@ -72,14 +69,11 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @throws NullPointerException if the given level is <code>null</code>.
 	 * @see #setLevels(Set)
 	 */
-	public void setLevel(final Log.Level minimumLevel)
-	{
+	public void setLevel(final Log.Level minimumLevel) {
 		final int minimumOrdinal = minimumLevel.ordinal(); //get the ordinal of the minimum level
 		final Set<Log.Level> levels = EnumSet.of(minimumLevel); //create a set with the minimum level
-		for(final Log.Level level : Log.Level.values()) //for all available levels
-		{
-			if(level.ordinal() > minimumOrdinal) //if this level is higher than the minimum
-			{
+		for(final Log.Level level : Log.Level.values()) { //for all available levels
+			if(level.ordinal() > minimumOrdinal) { //if this level is higher than the minimum
 				levels.add(level); //add this level to the set as well
 			}
 		}
@@ -93,8 +87,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * Returns the log information reported. Defaults to all report options.
 	 * @return The information that will be reported with each log.
 	 */
-	public Set<Log.Report> getReport()
-	{
+	public Set<Log.Report> getReport() {
 		return report;
 	}
 
@@ -103,8 +96,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param report The type of information to report.
 	 * @throws NullPointerException if the given report is <code>null</code>.
 	 */
-	public void setReport(final Set<Log.Report> report)
-	{
+	public void setReport(final Set<Log.Report> report) {
 		this.report = unmodifiableSet(EnumSet.copyOf(checkInstance(report, "Report cannot be null.")));
 	}
 
@@ -112,8 +104,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	private File file = null;
 
 	/** The file to be used for logging, or <code>null</code> if no file is to be used. */
-	public File getFile()
-	{
+	public File getFile() {
 		return file;
 	}
 
@@ -122,10 +113,8 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param file The file to be used for logging, or <code>null</code> if no file is to be used.
 	 * @see #setWriter(Writer)
 	 */
-	public void setFile(final File file)
-	{
-		if(file != null) //if they want to use a file
-		{
+	public void setFile(final File file) {
+		if(file != null) { //if they want to use a file
 			writer = null; //we won't use a writer
 		}
 		this.file = file;
@@ -144,25 +133,19 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @throws NullPointerException if the given file is <code>null</code>.
 	 * @throws IOException if there is an error getting a writer for the file.
 	 */
-	protected Writer getWriter(final File file) throws IOException
-	{
+	protected Writer getWriter(final File file) throws IOException {
 		Writer writer = fileWriterMap.get(file); //see if we already have a writer for this file
-		if(writer == null) //if we don't yet have a writer for this file
-		{
+		if(writer == null) { //if we don't yet have a writer for this file
 			fileWriterMap.writeLock().lock();
-			try
-			{
+			try {
 				writer = fileWriterMap.get(file); //try again to get a writer for this file
-				if(writer == null) //if we still don't have a writer for this file
-				{
+				if(writer == null) { //if we still don't have a writer for this file
 					final OutputStream outputStream = new FileOutputStream(file, true); //create an output stream
 					outputStream.write(ByteOrderMark.UTF_8.getBytes()); //write the UTF-8 byte order mark
 					writer = new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(outputStream), UTF_8_CHARSET)); //open an asynchronous, buffered writer for appending to the file in UTF-8
 					fileWriterMap.put(file, writer); //associate the writer in the map so that we can use it next time
 				}
-			}
-			finally
-			{
+			} finally {
 				fileWriterMap.writeLock().unlock();
 			}
 		}
@@ -174,32 +157,21 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * if there is an error.
 	 */
 	@Override
-	public void dispose()
-	{
-		try
-		{
+	public void dispose() {
+		try {
 			super.dispose();
-		}
-		finally
-		{
+		} finally {
 			fileWriterMap.readLock().lock();
-			try
-			{
-				for(final Writer writer : fileWriterMap.values())
-				{
-					try
-					{
+			try {
+				for(final Writer writer : fileWriterMap.values()) {
+					try {
 						writer.close();
-					}
-					catch(final IOException ioException)
-					{
+					} catch(final IOException ioException) {
 						System.err.println("Error closing log writer; " + ioException.getMessage());
 						ioException.printStackTrace();
 					}
 				}
-			}
-			finally
-			{
+			} finally {
 				fileWriterMap.readLock().unlock();
 			}
 		}
@@ -209,8 +181,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	private Writer writer = null;
 
 	/** @return The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information. */
-	public Writer getWriter()
-	{
+	public Writer getWriter() {
 		return writer;
 	}
 
@@ -219,10 +190,8 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param writer The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.
 	 * @see #setFile(File)
 	 */
-	public void setWriter(final Writer writer)
-	{
-		if(writer != null) //if they want to use a writer
-		{
+	public void setWriter(final Writer writer) {
+		if(writer != null) { //if they want to use a writer
 			file = null; //we won't use a file
 		}
 		this.writer = writer;
@@ -232,8 +201,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	private boolean standardOutput;
 
 	/** @return Whether information should be sent to {@link System#out} or {@link System#err} as appropriate, in addition to other destinations, if any. */
-	public boolean isStandardOutput()
-	{
+	public boolean isStandardOutput() {
 		return standardOutput;
 	}
 
@@ -241,16 +209,14 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * Sets whether information should be sent to {@link System#out} or {@link System#err} as appropriate, in addition to other destinations, if any.
 	 * @param standardOutput Whether information should be sent to the standard output.
 	 */
-	public void setStandardOutput(final boolean standardOutput)
-	{
+	public void setStandardOutput(final boolean standardOutput) {
 		this.standardOutput = standardOutput;
 	}
 
 	/**
 	 * Default constructor. Logging to the standard output will be enabled by default. The log level defaults to {@link Log.Level#INFO} and above.
 	 */
-	public DefaultLogConfiguration()
-	{
+	public DefaultLogConfiguration() {
 		this((File)null);
 	}
 
@@ -259,8 +225,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param levels The levels that will be logged.
 	 * @throws NullPointerException if the given levels is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final Set<Log.Level> levels)
-	{
+	public DefaultLogConfiguration(final Set<Log.Level> levels) {
 		this();
 		setLevels(levels);
 	}
@@ -270,8 +235,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param minimumLevel The minimum level that will be logged.
 	 * @throws NullPointerException if the given level is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final Log.Level minimumLevel)
-	{
+	public DefaultLogConfiguration(final Log.Level minimumLevel) {
 		this();
 		setLevel(minimumLevel);
 	}
@@ -280,8 +244,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * File constructor. If a file is given, logging to the standard output will default to disabled. The log level defaults to {@link Log.Level#INFO} and above.
 	 * @param file The file to be used for logging, or <code>null</code> if no file is to be used.
 	 */
-	public DefaultLogConfiguration(final File file)
-	{
+	public DefaultLogConfiguration(final File file) {
 		this(file, Log.Level.INFO);
 	}
 
@@ -290,8 +253,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * above.
 	 * @param writer The writer to be used to log information, or <code>null</code> if there is no writer to be used to log information.
 	 */
-	public DefaultLogConfiguration(final Writer writer)
-	{
+	public DefaultLogConfiguration(final Writer writer) {
 		this(writer, Log.Level.INFO);
 	}
 
@@ -301,8 +263,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param levels The levels that will be logged.
 	 * @throws NullPointerException if the given levels is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final File file, final Set<Log.Level> levels)
-	{
+	public DefaultLogConfiguration(final File file, final Set<Log.Level> levels) {
 		this(file);
 		setLevels(levels);
 	}
@@ -313,8 +274,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param minimumLevel The minimum level that will be logged.
 	 * @throws NullPointerException if the given level is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel)
-	{
+	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel) {
 		super(true); //allow the use of a common logger
 		this.file = file;
 		setStandardOutput(file == null); //by default turn off logging to the standard output if a writer was given
@@ -327,8 +287,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param levels The levels that will be logged.
 	 * @throws NullPointerException if the given levels is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final Writer writer, final Set<Log.Level> levels)
-	{
+	public DefaultLogConfiguration(final Writer writer, final Set<Log.Level> levels) {
 		this(writer);
 		setLevels(levels);
 	}
@@ -339,8 +298,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param minimumLevel The minimum level that will be logged.
 	 * @throws NullPointerException if the given level is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel)
-	{
+	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel) {
 		super(true); //allow the use of a common logger
 		this.writer = writer;
 		setStandardOutput(writer == null); //by default turn off logging to the standard output if a writer was given
@@ -354,8 +312,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param report The type of information to report.
 	 * @throws NullPointerException if the given levels and/or report is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final File file, final Set<Log.Level> levels, final Set<Log.Report> report)
-	{
+	public DefaultLogConfiguration(final File file, final Set<Log.Level> levels, final Set<Log.Report> report) {
 		this(file);
 		setLevels(levels);
 		setReport(report);
@@ -368,8 +325,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param report The type of information to report.
 	 * @throws NullPointerException if the given level and/or report is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel, final Set<Log.Report> report)
-	{
+	public DefaultLogConfiguration(final File file, final Log.Level minimumLevel, final Set<Log.Report> report) {
 		this(file);
 		setLevel(minimumLevel);
 		setReport(report);
@@ -382,8 +338,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param report The type of information to report.
 	 * @throws NullPointerException if the given levels and/or report is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final Writer writer, final Set<Log.Level> levels, final Set<Log.Report> report)
-	{
+	public DefaultLogConfiguration(final Writer writer, final Set<Log.Level> levels, final Set<Log.Report> report) {
 		this(writer);
 		setLevels(levels);
 		setReport(report);
@@ -396,8 +351,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @param report The type of information to report.
 	 * @throws NullPointerException if the given level and/or report is <code>null</code>.
 	 */
-	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel, final Set<Log.Report> report)
-	{
+	public DefaultLogConfiguration(final Writer writer, final Log.Level minimumLevel, final Set<Log.Report> report) {
 		this(writer);
 		setLevel(minimumLevel);
 		setReport(report);
@@ -413,8 +367,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @see #getLevels()
 	 * @see #getReport()
 	 */
-	public Logger createLogger(final Class<?> objectClass)
-	{
+	public Logger createLogger(final Class<?> objectClass) {
 		final Writer writer = getWriter(); //see if we have a writer specified
 		final DefaultLogger logger = writer != null ? new DefaultLogger(this, writer) : new DefaultLogger(this, getFile()); //configure the logger with a writer or file (the latter of which may be null)
 		logger.setStandardOutput(isStandardOutput()); //set whether the standard output should be used

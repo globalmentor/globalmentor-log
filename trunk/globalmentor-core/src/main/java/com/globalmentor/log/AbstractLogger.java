@@ -16,19 +16,19 @@
 
 package com.globalmentor.log;
 
-/**Abstract implementation of a logger.
-@author Garret Wilson
-*/
-public abstract class AbstractLogger implements Logger
-{
+/**
+ * Abstract implementation of a logger.
+ * @author Garret Wilson
+ */
+public abstract class AbstractLogger implements Logger {
 
-	/**Logs a series of objects at a given log level.
-	This implementation delegates to {@link #trace(Object...)}, {@link #debug(Object...)}, {@link #info(Object...)},
-	{@link #warn(Object...)}, or {@link #error(Object...)}. 
-	@param level The level at which to log the objects.
-	@param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
-	@throws NullPointerException if the given log level is <code>null</code>.
-	*/
+	/**
+	 * Logs a series of objects at a given log level. This implementation delegates to {@link #trace(Object...)}, {@link #debug(Object...)},
+	 * {@link #info(Object...)}, {@link #warn(Object...)}, or {@link #error(Object...)}.
+	 * @param level The level at which to log the objects.
+	 * @param objects The objects to log; if an object is an instance of {@link Throwable}, a stack trace will be generated.
+	 * @throws NullPointerException if the given log level is <code>null</code>.
+	 */
 	public void log(final Log.Level level, final Object... objects) {
 		switch(level) {
 			case TRACE:
@@ -47,7 +47,7 @@ public abstract class AbstractLogger implements Logger
 				error(objects);
 				break;
 			default:
-				throw new AssertionError("Unrecognized log level: "+level);
+				throw new AssertionError("Unrecognized log level: " + level);
 		}
 	}
 

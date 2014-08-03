@@ -31,11 +31,9 @@ import com.globalmentor.log.*;
  * 
  * @author Garret Wilson
  */
-public class AbstractTest
-{
+public class AbstractTest {
 
-	public AbstractTest()
-	{
+	public AbstractTest() {
 		Log.setDefaultConfiguration(new DefaultLogConfiguration(Log.Level.DEBUG));
 	}
 

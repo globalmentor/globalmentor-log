@@ -30,8 +30,7 @@ import com.globalmentor.log.Log;
  * @author Garret Wilson
  * @see Log
  */
-public class LogInputStream extends InputStreamDecorator<InputStream>
-{
+public class LogInputStream extends InputStreamDecorator<InputStream> {
 
 	/** The size of the local buffer used for skipping. */
 	private final long SKIP_BUFFER_SIZE = 2048;
@@ -44,8 +43,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 	 * @param inputStream The input stream to decorate.
 	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
-	public LogInputStream(final InputStream inputStream)
-	{
+	public LogInputStream(final InputStream inputStream) {
 		this(inputStream, Log.Level.INFO);
 	}
 
@@ -54,8 +52,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 	 * @param inputStream The input stream to decorate.
 	 * @throws NullPointerException if the given stream and/or log level is <code>null</code>.
 	 */
-	public LogInputStream(final InputStream inputStream, final Log.Level logLevel)
-	{
+	public LogInputStream(final InputStream inputStream, final Log.Level logLevel) {
 		super(inputStream); //construct the parent class
 		this.logLevel = checkInstance(logLevel, "Log level cannot be null.");
 	}
@@ -64,10 +61,8 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 	private boolean eot = false;
 
 	/** Called when the end-of transmission is detected. The EOT will be logged the first time it is detected. */
-	protected void logEOT()
-	{
-		if(!eot)
-		{
+	protected void logEOT() {
+		if(!eot) {
 			eot = true;
 			Log.log(logLevel, Log.RAW_FLAG, END_OF_TRANSMISSION_SYMBOL); //EOT
 		}
@@ -75,15 +70,11 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 
 	/** {@inheritDoc} */
 	@Override
-	public int read() throws IOException
-	{
+	public int read() throws IOException {
 		final int b = super.read(); //read data normally
-		if(b >= 0)
-		{
+		if(b >= 0) {
 			Log.log(logLevel, Log.RAW_FLAG, Character.valueOf((char)b));
-		}
-		else
-		{
+		} else {
 			logEOT();
 		}
 		return b; //return the data read
@@ -91,15 +82,11 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 
 	/** {@inheritDoc} */
 	@Override
-	public int read(byte b[]) throws IOException
-	{
+	public int read(byte b[]) throws IOException {
 		final int count = super.read(b); //read data normally
-		if(count > 0) //if data was read
-		{
+		if(count > 0) { //if data was read
 			Log.log(logLevel, Log.RAW_FLAG, new String(b, 0, count, US_ASCII_CHARSET));
-		}
-		else if(count < 0)
-		{
+		} else if(count < 0) {
 			logEOT();
 		}
 		return count; //return the amount of data read
@@ -107,15 +94,11 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 
 	/** {@inheritDoc} */
 	@Override
-	public int read(byte b[], int off, int len) throws IOException
-	{
+	public int read(byte b[], int off, int len) throws IOException {
 		final int count = super.read(b, off, len); //read data normally
-		if(count > 0) //if data was read
-		{
+		if(count > 0) { //if data was read
 			Log.log(logLevel, Log.RAW_FLAG, new String(b, off, count, US_ASCII_CHARSET));
-		}
-		else if(count < 0)
-		{
+		} else if(count < 0) {
 			logEOT();
 		}
 		return count; //return the amount of data read
@@ -123,21 +106,16 @@ public class LogInputStream extends InputStreamDecorator<InputStream>
 
 	/** {@inheritDoc} This version reads and captures the skipped data. */
 	@Override
-	public long skip(final long n) throws IOException
-	{
+	public long skip(final long n) throws IOException {
 		final byte[] buffer = new byte[(int)min(n, SKIP_BUFFER_SIZE)]; //make a buffer only as large as needed (we can cast to an int, because we know that at least one of the values is an int, and we're taking the minimum of the two)
 		final int bufferSize = buffer.length; //get the length of the buffer
 		long bytesLeft = n; //we'll start out needing to read all the bytes
 		int bufferBytesRead = 0; //we'll keep track of how many bytes we read each time
-		while(bytesLeft > 0 && bufferBytesRead >= 0) //while there are bytes left and we haven't reached the end of the stream
-		{
+		while(bytesLeft > 0 && bufferBytesRead >= 0) { //while there are bytes left and we haven't reached the end of the stream
 			bufferBytesRead = read(buffer, 0, (int)min(bytesLeft, bufferSize)); //read as many bytes as we have left, or as many as our buffer can hold, whichever is less; this will also automatically capture our data
-			if(bufferBytesRead > 0) //if we read any bytes at all (this could be negative, so don't blindly subtract; but since we're checking anyway, we might as well throw out the zero case)
-			{
+			if(bufferBytesRead > 0) { //if we read any bytes at all (this could be negative, so don't blindly subtract; but since we're checking anyway, we might as well throw out the zero case)
 				bytesLeft -= bufferBytesRead; //decrease the bytes left by the number read
-			}
-			else if(bufferBytesRead < 0)
-			{
+			} else if(bufferBytesRead < 0) {
 				logEOT();
 			}
 		}

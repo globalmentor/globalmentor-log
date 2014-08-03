@@ -39,34 +39,29 @@ import static com.globalmentor.text.TextFormatter.*;
  * @author Garret Wilson
  * @see java.util.logging.Logger
  */
-public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.Logger>
-{
+public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.Logger> {
 
 	/**
 	 * Java logger constructor.
 	 * @param logger The Java logger delegate.
 	 * @throws NullPointerException if the given logger is <code>null</code>.
 	 */
-	public JavaLoggingLogger(final java.util.logging.Logger logger)
-	{
+	public JavaLoggingLogger(final java.util.logging.Logger logger) {
 		super(logger);
 	}
 
 	/**
 	 * {@inheritDoc} This method delegates to {@link java.util.logging.Logger#fine(String)}.
 	 */
-	public void trace(final Object... objects)
-	{
+	public void trace(final Object... objects) {
 		getLogger().fine(formatList(' ', objects));
 	}
 
 	/**
 	 * {@inheritDoc} This method delegates to {@link #trace(Object...)}.
 	 */
-	public void traceStack(final Object... objects)
-	{
-		if(objects.length > 0)
-		{
+	public void traceStack(final Object... objects) {
+		if(objects.length > 0) {
 			trace(objects); //trace the information
 		}
 		trace(getStackTraceString(new Throwable())); //write a stack trace
@@ -75,32 +70,28 @@ public class JavaLoggingLogger extends AbstractAdapterLogger<java.util.logging.L
 	/**
 	 * {@inheritDoc} This method delegates to {@link java.util.logging.Logger#config(String)}.
 	 */
-	public void debug(final Object... objects)
-	{
+	public void debug(final Object... objects) {
 		getLogger().config(formatList(' ', objects));
 	}
 
 	/**
 	 * {@inheritDoc} This method delegates to {@link java.util.logging.Logger#info(String)}.
 	 */
-	public void info(final Object... objects)
-	{
+	public void info(final Object... objects) {
 		getLogger().info(formatList(' ', objects));
 	}
 
 	/**
 	 * {@inheritDoc} This method delegates to {@link java.util.logging.Logger#warning(String)}.
 	 */
-	public void warn(final Object... objects)
-	{
+	public void warn(final Object... objects) {
 		getLogger().warning(formatList(' ', objects));
 	}
 
 	/**
 	 * {@inheritDoc} This method delegates to {@link java.util.logging.Logger#severe(String)}.
 	 */
-	public void error(final Object... objects)
-	{
+	public void error(final Object... objects) {
 		getLogger().severe(formatList(' ', objects));
 	}
 

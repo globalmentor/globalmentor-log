@@ -19,14 +19,13 @@ package com.globalmentor.log;
 /**
  * The interface to logging functionality.
  * <p>
- * The {@link Log#RAW_FLAG}, if present at the beginning of a sequence of log objects, indicates that the log text should be interpreted as literal, raw data with
- * no preface or control characters. This allows the caller wants to control its own line breaks so that no additional line separator is added, allowing the
- * implementation of progress bars, for example.
+ * The {@link Log#RAW_FLAG}, if present at the beginning of a sequence of log objects, indicates that the log text should be interpreted as literal, raw data
+ * with no preface or control characters. This allows the caller wants to control its own line breaks so that no additional line separator is added, allowing
+ * the implementation of progress bars, for example.
  * </p>
  * @author Garret Wilson
  */
-public interface Logger
-{
+public interface Logger {
 
 	/**
 	 * Logs a series of trace objects.

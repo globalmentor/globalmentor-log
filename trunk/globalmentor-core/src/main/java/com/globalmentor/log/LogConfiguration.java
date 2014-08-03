@@ -18,29 +18,34 @@ package com.globalmentor.log;
 
 import com.globalmentor.config.Configuration;
 
-/**Configuration for logging.
-@author Garret Wilson
-*/
-public interface LogConfiguration extends Configuration
-{
+/**
+ * Configuration for logging.
+ * @author Garret Wilson
+ */
+public interface LogConfiguration extends Configuration {
 
-	/**Retrieves an appropriate logger.
-	<p>The returned logger may be a default logger, or it may be a logger configured for the calling class.</p>
-	@return An appropriate logger for the current circumstances.
-	*/
+	/**
+	 * Retrieves an appropriate logger.
+	 * <p>
+	 * The returned logger may be a default logger, or it may be a logger configured for the calling class.
+	 * </p>
+	 * @return An appropriate logger for the current circumstances.
+	 */
 	public Logger getLogger();
 
-	/**Retrieves the appropriate logger for the given class.
-	@param objectClass The class for which a logger should be returned.
-	@return The logger configured for the given class.
-	@throws NullPointerException if the given class is <code>null</code>.
-	*/
+	/**
+	 * Retrieves the appropriate logger for the given class.
+	 * @param objectClass The class for which a logger should be returned.
+	 * @return The logger configured for the given class.
+	 * @throws NullPointerException if the given class is <code>null</code>.
+	 */
 	public Logger getLogger(final Class<?> objectClass);
 
-	/**Creates a new logger for the given class, configured using the current configuration settings.
- 	@param objectClass The specific class for which a logger should be returned.
-	@return A new logger instance for the given class.
-	*/
+	/**
+	 * Creates a new logger for the given class, configured using the current configuration settings.
+	 * @param objectClass The specific class for which a logger should be returned.
+	 * @return A new logger instance for the given class.
+	 */
 	public Logger createLogger(final Class<?> objectClass);
 
 }

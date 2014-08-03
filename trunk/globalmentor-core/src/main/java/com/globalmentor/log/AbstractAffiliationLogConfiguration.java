@@ -18,65 +18,68 @@ package com.globalmentor.log;
 
 import static com.globalmentor.java.Objects.*;
 
-/**An abstract logging configuration that allows several predefined ways to affiliate loggers with classes.
-By default this class using {@link Affiliation#PACKAGE} to affiliate loggers with the package of the requesting class.
-@author Garret Wilson
-*/
-public abstract class AbstractAffiliationLogConfiguration extends AbstractLogConfiguration<Object>
-{
+/**
+ * An abstract logging configuration that allows several predefined ways to affiliate loggers with classes. By default this class using
+ * {@link Affiliation#PACKAGE} to affiliate loggers with the package of the requesting class.
+ * @author Garret Wilson
+ */
+public abstract class AbstractAffiliationLogConfiguration extends AbstractLogConfiguration<Object> {
 
-	/**Indicates the granularity with which loggers are associated with classes.*/
-	public enum Affiliation
-	{
-		/**Loggers are associated with individual classes.*/
+	/** Indicates the granularity with which loggers are associated with classes. */
+	public enum Affiliation {
+		/** Loggers are associated with individual classes. */
 		CLASS,
 
-		/**Loggers are associated with packages.*/
+		/** Loggers are associated with packages. */
 		PACKAGE;
 	}
 
-	/**The granularity with which loggers are associated with classes.*/
+	/** The granularity with which loggers are associated with classes. */
 	private Affiliation affiliation;
 
-		/**@return The granularity with which loggers are associated with classes.*/
-		public Affiliation getAffiliation() {return affiliation;}
+	/** @return The granularity with which loggers are associated with classes. */
+	public Affiliation getAffiliation() {
+		return affiliation;
+	}
 
-		/**Sets the granularity with which loggers are associated with classes.
-		@param affiliation The granularity with which loggers are associated with classes.
-		*/
-		public void setAffiliation(final Affiliation affiliation) {this.affiliation=checkInstance(affiliation, "Affiliation cannot be null.");}
+	/**
+	 * Sets the granularity with which loggers are associated with classes.
+	 * @param affiliation The granularity with which loggers are associated with classes.
+	 */
+	public void setAffiliation(final Affiliation affiliation) {
+		this.affiliation = checkInstance(affiliation, "Affiliation cannot be null.");
+	}
 
-	/**Determines the object related to the given class with which a logger should be associated.
-	This could be the package of the class if loggers are grouped according to package,
-	or the class itself if loggers are configured on a fine-grained level.
-	<p>This implementation returns a key based upon the logger affiliation.</p>
- 	@param objectClass The specific class for which a logger key should be returned.
-	@return A new association for this class around which to group loggers.
-	@throws NullPointerException if the given class is <code>null</code>.
-	@see #getAffiliation()
-	*/
-	protected Object getLoggerKey(final Class<?> objectClass)
-	{
-		final Affiliation affiliation=getAffiliation();
-		switch(affiliation)
-		{
+	/**
+	 * Determines the object related to the given class with which a logger should be associated. This could be the package of the class if loggers are grouped
+	 * according to package, or the class itself if loggers are configured on a fine-grained level.
+	 * <p>
+	 * This implementation returns a key based upon the logger affiliation.
+	 * </p>
+	 * @param objectClass The specific class for which a logger key should be returned.
+	 * @return A new association for this class around which to group loggers.
+	 * @throws NullPointerException if the given class is <code>null</code>.
+	 * @see #getAffiliation()
+	 */
+	protected Object getLoggerKey(final Class<?> objectClass) {
+		final Affiliation affiliation = getAffiliation();
+		switch(affiliation) {
 			case CLASS:
 				return checkInstance(objectClass);
 			case PACKAGE:
 				return objectClass.getPackage();
 			default:
-				throw new AssertionError("Unrecognized affiliation: "+affiliation);
+				throw new AssertionError("Unrecognized affiliation: " + affiliation);
 		}
 	}
 
-	/**Common logger support constructor.
-	Affiliation defaults to {@link Affiliation#PACKAGE}.
-	@param supportCommonLogger Whether a common logger is used if no specific logger registrations have yet been made.
-	*/
-	public AbstractAffiliationLogConfiguration(final boolean supportCommonLogger)
-	{
+	/**
+	 * Common logger support constructor. Affiliation defaults to {@link Affiliation#PACKAGE}.
+	 * @param supportCommonLogger Whether a common logger is used if no specific logger registrations have yet been made.
+	 */
+	public AbstractAffiliationLogConfiguration(final boolean supportCommonLogger) {
 		super(supportCommonLogger);
-		this.affiliation=Affiliation.PACKAGE;
+		this.affiliation = Affiliation.PACKAGE;
 	}
 
 }
