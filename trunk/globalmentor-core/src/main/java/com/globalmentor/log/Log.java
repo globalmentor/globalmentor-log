@@ -36,13 +36,13 @@ import com.globalmentor.lex.Identifier;
 public final class Log {
 
 	/** The common name extension for log files. */
-	public final static String NAME_EXTENSION = "log";
+	public static final String NAME_EXTENSION = "log";
 
 	/** The initial character that serves as a flag that the log text should be interpreted as literal, raw data with no preface or control characters. */
-	private final static char RAW_FLAG_CHAR = DATA_LINK_ESCAPE_CHAR;
+	private static final char RAW_FLAG_CHAR = DATA_LINK_ESCAPE_CHAR;
 
 	/** The initial flag that the log text should be interpreted as literal, raw data with no preface or control characters. */
-	public final static Character RAW_FLAG = Character.valueOf(RAW_FLAG_CHAR);
+	public static final Character RAW_FLAG = Character.valueOf(RAW_FLAG_CHAR);
 
 	static {
 		setDefaultConfiguration(new DefaultLogConfiguration()); //install a default log configuration using stdout/err

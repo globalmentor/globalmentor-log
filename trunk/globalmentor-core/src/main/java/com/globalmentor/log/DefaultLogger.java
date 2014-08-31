@@ -55,7 +55,7 @@ public class DefaultLogger extends AbstractLogger {
 	protected static final DateFormat DATE_FORMAT = new W3CDateFormat(W3CDateFormat.Style.DATE_TIME);
 
 	/** The system line separator characters in use when the class is created. */
-	private final static String LINE_SEPARATOR = getLineSeparator();
+	private static final String LINE_SEPARATOR = getLineSeparator();
 
 	/** The levels that should be logged. */
 	private Set<Log.Level> levels = unmodifiableSet(EnumSet.allOf(Log.Level.class));
