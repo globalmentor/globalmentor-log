@@ -17,9 +17,9 @@
 package com.globalmentor.io;
 
 import java.io.*;
-import static java.lang.Math.*;
 
-import static com.globalmentor.io.Charsets.*;
+import static java.lang.Math.*;
+import static java.nio.charset.StandardCharsets.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
 
@@ -85,7 +85,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 	public int read(byte b[]) throws IOException {
 		final int count = super.read(b); //read data normally
 		if(count > 0) { //if data was read
-			Log.log(logLevel, Log.RAW_FLAG, new String(b, 0, count, US_ASCII_CHARSET));
+			Log.log(logLevel, Log.RAW_FLAG, new String(b, 0, count, US_ASCII));
 		} else if(count < 0) {
 			logEOT();
 		}
@@ -97,7 +97,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 	public int read(byte b[], int off, int len) throws IOException {
 		final int count = super.read(b, off, len); //read data normally
 		if(count > 0) { //if data was read
-			Log.log(logLevel, Log.RAW_FLAG, new String(b, off, count, US_ASCII_CHARSET));
+			Log.log(logLevel, Log.RAW_FLAG, new String(b, off, count, US_ASCII));
 		} else if(count < 0) {
 			logEOT();
 		}

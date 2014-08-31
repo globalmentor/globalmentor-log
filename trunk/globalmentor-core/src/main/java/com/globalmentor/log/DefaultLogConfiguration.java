@@ -22,9 +22,8 @@ import java.util.*;
 import com.globalmentor.collections.*;
 import com.globalmentor.io.*;
 
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
-
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 
 /**
@@ -142,7 +141,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 				if(writer == null) { //if we still don't have a writer for this file
 					final OutputStream outputStream = new FileOutputStream(file, true); //create an output stream
 					outputStream.write(ByteOrderMark.UTF_8.getBytes()); //write the UTF-8 byte order mark
-					writer = new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(outputStream), UTF_8_CHARSET)); //open an asynchronous, buffered writer for appending to the file in UTF-8
+					writer = new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(outputStream), UTF_8)); //open an asynchronous, buffered writer for appending to the file in UTF-8
 					fileWriterMap.put(file, writer); //associate the writer in the map so that we can use it next time
 				}
 			} finally {

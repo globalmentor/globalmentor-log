@@ -18,9 +18,10 @@ package com.globalmentor.io;
 
 import java.io.*;
 
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
+import static java.nio.charset.StandardCharsets.*;
+
 import com.globalmentor.log.Log;
 
 /**
@@ -62,14 +63,14 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream> {
 	/** {@inheritDoc} */
 	@Override
 	public void write(byte b[]) throws IOException {
-		Log.log(logLevel, Log.RAW_FLAG, new String(b, US_ASCII_CHARSET));
+		Log.log(logLevel, Log.RAW_FLAG, new String(b, US_ASCII));
 		super.write(b); //do the default writing
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void write(byte b[], int off, int len) throws IOException {
-		Log.log(logLevel, Log.RAW_FLAG, new String(b, off, len, US_ASCII_CHARSET));
+		Log.log(logLevel, Log.RAW_FLAG, new String(b, off, len, US_ASCII));
 		super.write(b, off, len); //do the default writing
 	}
 
