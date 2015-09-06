@@ -17,12 +17,13 @@
 package com.globalmentor.log;
 
 import com.globalmentor.config.Configuration;
+import com.globalmentor.java.Disposable;
 
 /**
  * Configuration for logging.
  * @author Garret Wilson
  */
-public interface LogConfiguration extends Configuration {
+public interface LogConfiguration extends Configuration, Disposable {
 
 	/**
 	 * Retrieves an appropriate logger.
