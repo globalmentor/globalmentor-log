@@ -21,6 +21,7 @@ import java.util.*;
 
 import com.globalmentor.collections.*;
 import com.globalmentor.io.*;
+import com.globalmentor.java.Disposable;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
@@ -40,7 +41,7 @@ import static com.globalmentor.java.Objects.*;
  * @author Garret Wilson
  * @see DefaultLogger
  */
-public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration {
+public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration implements Disposable {
 
 	/** The levels that should be logged. */
 	private Set<Log.Level> levels = unmodifiableSet(EnumSet.allOf(Log.Level.class));
@@ -157,22 +158,18 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 */
 	@Override
 	public void dispose() {
+		fileWriterMap.readLock().lock();
 		try {
-			super.dispose();
-		} finally {
-			fileWriterMap.readLock().lock();
-			try {
-				for(final Writer writer : fileWriterMap.values()) {
-					try {
-						writer.close();
-					} catch(final IOException ioException) {
-						System.err.println("Error closing log writer; " + ioException.getMessage());
-						ioException.printStackTrace();
-					}
+			for(final Writer writer : fileWriterMap.values()) {
+				try {
+					writer.close();
+				} catch(final IOException ioException) {
+					System.err.println("Error closing log writer; " + ioException.getMessage());
+					ioException.printStackTrace();
 				}
-			} finally {
-				fileWriterMap.readLock().unlock();
 			}
+		} finally {
+			fileWriterMap.readLock().unlock();
 		}
 	}
 

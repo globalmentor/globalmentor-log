@@ -18,7 +18,7 @@ package com.globalmentor.log;
 
 import static com.globalmentor.java.Characters.*;
 
-import com.globalmentor.config.Configurator;
+import com.globalmentor.config.Concerns;
 import com.globalmentor.lex.Identifier;
 
 /**
@@ -80,10 +80,10 @@ public final class Log {
 	 * This method is the preferred approach for determining the default log configuration, as it ensures a default configuration has been installed.
 	 * </p>
 	 * @return The default log configuration.
-	 * @see Configurator#getDefaultConfiguration(Class)
+	 * @see Concerns#getDefaultConcern(Class)
 	 */
 	public static LogConfiguration getDefaultConfiguration() {
-		return Configurator.getDefaultConfiguration(LogConfiguration.class);
+		return Concerns.getDefaultConcern(LogConfiguration.class);
 	}
 
 	/**
@@ -91,10 +91,10 @@ public final class Log {
 	 * @param configuration The configuration to set.
 	 * @return The previous configuration, or <code>null</code> if there was no previous configuration.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
-	 * @see Configurator#setDefaultConfiguration(Class)
+	 * @see Concerns#registerDefaultConcern(Class)
 	 */
 	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration) {
-		return Configurator.setDefaultConfiguration(LogConfiguration.class, logConfiguration);
+		return Concerns.registerDefaultConcern(LogConfiguration.class, logConfiguration);
 	}
 
 	/**
@@ -103,10 +103,10 @@ public final class Log {
 	 * This method is the preferred approach for determining the log configuration, as it ensures a default configuration has been installed.
 	 * </p>
 	 * @return The configured log configuration for the current context.
-	 * @see Configurator#getConfiguration(Class)
+	 * @see Concerns#getConcern(Class)
 	 */
 	public static LogConfiguration getConfiguration() {
-		return Configurator.getConfiguration(LogConfiguration.class);
+		return Concerns.getConcern(LogConfiguration.class);
 	}
 
 	/**

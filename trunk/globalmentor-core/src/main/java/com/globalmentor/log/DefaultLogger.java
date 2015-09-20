@@ -22,8 +22,8 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
-import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.java.StackTrace;
+import com.globalmentor.model.ConfigurationException;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.OperatingSystem.*;
