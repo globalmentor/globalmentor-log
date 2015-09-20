@@ -18,7 +18,7 @@ package com.globalmentor.log;
 
 import static com.globalmentor.java.Characters.*;
 
-import com.globalmentor.config.Concerns;
+import com.globalmentor.concern.Concerns;
 import com.globalmentor.lex.Identifier;
 
 /**

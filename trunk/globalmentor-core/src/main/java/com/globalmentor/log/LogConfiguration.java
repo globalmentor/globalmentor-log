@@ -16,7 +16,7 @@
 
 package com.globalmentor.log;
 
-import com.globalmentor.config.Concern;
+import com.globalmentor.concern.Concern;
 import com.globalmentor.java.Disposable;
 
 /**
