@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.globalmentor.io;
+package com.globalmentor.log;
 
 import java.io.*;
+
+import com.globalmentor.io.OutputStreamDecorator;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
 import static java.nio.charset.StandardCharsets.*;
-
-import com.globalmentor.log.Log;
 
 /**
  * An output stream that logs all transferred bytes of a decorated stream.

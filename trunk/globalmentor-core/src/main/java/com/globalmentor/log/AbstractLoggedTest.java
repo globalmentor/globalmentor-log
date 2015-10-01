@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.globalmentor.test;
+package com.globalmentor.log;
 
 //import static org.hamcrest.Matchers.*;
 //import static org.junit.Assert.*;
 //import org.junit.Test;
-
-import com.globalmentor.log.*;
 
 /**
  * An abstract base class for tests.
@@ -31,9 +29,9 @@ import com.globalmentor.log.*;
  * 
  * @author Garret Wilson
  */
-public class AbstractTest {
+public class AbstractLoggedTest {
 
-	public AbstractTest() {
+	public AbstractLoggedTest() {
 		Log.setDefaultConfiguration(new DefaultLogConfiguration(Log.Level.DEBUG));
 	}
 
