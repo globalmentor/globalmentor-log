@@ -16,8 +16,9 @@
 
 package com.globalmentor.log;
 
-import com.globalmentor.concern.Concern;
 import com.globalmentor.java.Disposable;
+
+import io.csar.Concern;
 
 /**
  * Configuration for logging.

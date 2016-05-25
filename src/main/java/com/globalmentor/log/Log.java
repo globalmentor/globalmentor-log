@@ -18,8 +18,9 @@ package com.globalmentor.log;
 
 import static com.globalmentor.java.Characters.*;
 
-import com.globalmentor.concern.Concerns;
 import com.globalmentor.lex.Identifier;
+
+import io.csar.Csar;
 
 /**
  * Central class for controlling logging.
@@ -80,10 +81,10 @@ public final class Log {
 	 * This method is the preferred approach for determining the default log configuration, as it ensures a default configuration has been installed.
 	 * </p>
 	 * @return The default log configuration.
-	 * @see Concerns#getDefaultConcern(Class)
+	 * @see Csar#getDefaultConcern(Class)
 	 */
 	public static LogConfiguration getDefaultConfiguration() {
-		return Concerns.getDefaultConcern(LogConfiguration.class);
+		return Csar.getDefaultConcern(LogConfiguration.class);
 	}
 
 	/**
@@ -91,10 +92,10 @@ public final class Log {
 	 * @param configuration The configuration to set.
 	 * @return The previous configuration, or <code>null</code> if there was no previous configuration.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
-	 * @see Concerns#registerDefaultConcern(Class)
+	 * @see Csar#registerDefaultConcern(Class)
 	 */
 	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration) {
-		return Concerns.registerDefaultConcern(LogConfiguration.class, logConfiguration);
+		return Csar.registerDefaultConcern(LogConfiguration.class, logConfiguration);
 	}
 
 	/**
@@ -103,10 +104,10 @@ public final class Log {
 	 * This method is the preferred approach for determining the log configuration, as it ensures a default configuration has been installed.
 	 * </p>
 	 * @return The configured log configuration for the current context.
-	 * @see Concerns#getConcern(Class)
+	 * @see Csar#getConcern(Class)
 	 */
 	public static LogConfiguration getConfiguration() {
-		return Concerns.getConcern(LogConfiguration.class);
+		return Csar.getConcern(LogConfiguration.class);
 	}
 
 	/**
