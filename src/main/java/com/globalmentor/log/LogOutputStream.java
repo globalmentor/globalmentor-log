@@ -46,6 +46,7 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream> {
 	/**
 	 * Decorates the given output stream.
 	 * @param outputStream The output stream to decorate.
+	 * @param logLevel The log used to decorate the input stream.
 	 * @throws NullPointerException if the given stream and/or log level is <code>null</code>.
 	 */
 	public LogOutputStream(final OutputStream outputStream, final Log.Level logLevel) {
@@ -53,21 +54,18 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream> {
 		this.logLevel = checkInstance(logLevel, "Log level cannot be null.");
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(int b) throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, Character.valueOf((char)b));
 		super.write(b); //do the default writing
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(byte b[]) throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, new String(b, US_ASCII));
 		super.write(b); //do the default writing
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void write(byte b[], int off, int len) throws IOException {
 		Log.log(logLevel, Log.RAW_FLAG, new String(b, off, len, US_ASCII));

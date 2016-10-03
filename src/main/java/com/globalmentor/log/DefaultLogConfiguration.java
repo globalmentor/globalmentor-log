@@ -100,10 +100,10 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 		this.report = unmodifiableSet(EnumSet.copyOf(checkInstance(report, "Report cannot be null.")));
 	}
 
-	/** The file to use for logging, or <code>null</code> if no file is to be used. */
+	/** @return The file to use for logging, or <code>null</code> if no file is to be used. */
 	private File file = null;
 
-	/** The file to be used for logging, or <code>null</code> if no file is to be used. */
+	/** @return The file to be used for logging, or <code>null</code> if no file is to be used. */
 	public File getFile() {
 		return file;
 	}

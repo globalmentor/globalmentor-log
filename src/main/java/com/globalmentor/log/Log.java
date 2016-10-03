@@ -89,10 +89,10 @@ public final class Log {
 
 	/**
 	 * Sets the default log configuration.
-	 * @param configuration The configuration to set.
+	 * @param logConfiguration The configuration to set.
 	 * @return The previous configuration, or <code>null</code> if there was no previous configuration.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
-	 * @see Csar#registerDefaultConcern(Class)
+	 * @see Csar#registerDefaultConcern(Class, io.csar.Concern)
 	 */
 	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration) {
 		return Csar.registerDefaultConcern(LogConfiguration.class, logConfiguration);

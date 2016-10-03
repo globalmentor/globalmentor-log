@@ -149,6 +149,7 @@ public class DefaultLogger extends AbstractLogger {
 
 	/**
 	 * Log configuration constructor. Information will be logged to the standard output {@link System#out}.
+	 * @param logConfiguration The configuration to set.
 	 */
 	public DefaultLogger(final DefaultLogConfiguration logConfiguration) {
 		this(logConfiguration, (File)null, true); //don't log to a file, but log to stdout
@@ -156,6 +157,7 @@ public class DefaultLogger extends AbstractLogger {
 
 	/**
 	 * File constructor with no output to {@link System#out} or {@link System#err}.
+	 * @param logConfiguration The configuration to set.
 	 * @param file The file to use for logging, or <code>null</code> if no file logging should be used.
 	 */
 	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final File file) {
@@ -164,6 +166,7 @@ public class DefaultLogger extends AbstractLogger {
 
 	/**
 	 * File and log system out constructor.
+	 * @param logConfiguration The configuration to set.
 	 * @param file The file to use for logging, or <code>null</code> if no file logging should be used.
 	 * @param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
 	 */
@@ -175,6 +178,7 @@ public class DefaultLogger extends AbstractLogger {
 
 	/**
 	 * Writer constructor with no output to {@link System#out} or {@link System#err}.
+	 * @param logConfiguration The configuration to set.
 	 * @param writer The writer to use for logging.
 	 * @throws NullPointerException if the given writer is <code>null</code>.
 	 */
@@ -184,6 +188,7 @@ public class DefaultLogger extends AbstractLogger {
 
 	/**
 	 * Writer and log system out constructor.
+	 * @param logConfiguration The configuration to set.
 	 * @param writer The writer to use for logging.
 	 * @param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
 	 * @throws NullPointerException if the given writer is <code>null</code>.

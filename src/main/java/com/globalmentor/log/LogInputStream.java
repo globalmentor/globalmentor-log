@@ -39,7 +39,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 	private final Log.Level logLevel;
 
 	/**
-	 * Decorates the given input stream with a log level of {@link Log.LEVEL#INFO}.
+	 * Decorates the given input stream with a log level of {@link Log.Level#INFO}.
 	 * @param inputStream The input stream to decorate.
 	 * @throws NullPointerException if the given stream is <code>null</code>.
 	 */
@@ -50,6 +50,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 	/**
 	 * Decorates the given input stream.
 	 * @param inputStream The input stream to decorate.
+	 * @param logLevel The log used to decorate the input stream.
 	 * @throws NullPointerException if the given stream and/or log level is <code>null</code>.
 	 */
 	public LogInputStream(final InputStream inputStream, final Log.Level logLevel) {
@@ -68,7 +69,6 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 		}
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int read() throws IOException {
 		final int b = super.read(); //read data normally
@@ -80,7 +80,6 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 		return b; //return the data read
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int read(byte b[]) throws IOException {
 		final int count = super.read(b); //read data normally
@@ -92,7 +91,6 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 		return count; //return the amount of data read
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public int read(byte b[], int off, int len) throws IOException {
 		final int count = super.read(b, off, len); //read data normally
