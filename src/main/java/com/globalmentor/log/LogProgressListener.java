@@ -57,7 +57,7 @@ public class LogProgressListener implements ProgressListener {
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This version logs information regarding the progress event in the form <code>XX........ X% (123/1000)<code>.
+	 * This version logs information regarding the progress event in the form <code>XX........ X% (123/1000)</code>.
 	 * </p>
 	 * @see #isProgressBarLogged()
 	 * @see Log#info(Object...)

@@ -64,9 +64,7 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void traceStack(final Object... objects) {
 		Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to log4j
 		if(throwable == null) { //if no throwable was given
