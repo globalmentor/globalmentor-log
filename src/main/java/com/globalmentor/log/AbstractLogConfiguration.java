@@ -19,10 +19,11 @@ package com.globalmentor.log;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.StackTrace;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An abstract base implementation of logging configuration.
@@ -64,7 +65,7 @@ public abstract class AbstractLogConfiguration<K> implements LogConfiguration {
 	 * @see #isCommonLoggerSupported()
 	 */
 	public void setCommonLogger(final Logger commonLogger) {
-		this.commonLogger = checkInstance(commonLogger, "Common logger cannot be null.");
+		this.commonLogger = requireNonNull(commonLogger, "Common logger cannot be null.");
 	}
 
 	/**
@@ -120,7 +121,7 @@ public abstract class AbstractLogConfiguration<K> implements LogConfiguration {
 	 * @see #getLoggerKey(Class)
 	 */
 	public Logger registerLogger(final Class<?> objectClass, final Logger logger) {
-		return classLoggerMap.put(getLoggerKey(objectClass), checkInstance(logger, "Logger cannot be null."));
+		return classLoggerMap.put(getLoggerKey(objectClass), requireNonNull(logger, "Logger cannot be null."));
 	}
 
 	/**
@@ -170,7 +171,7 @@ public abstract class AbstractLogConfiguration<K> implements LogConfiguration {
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 */
 	public Logger getLogger(final Class<?> objectClass) {
-		checkInstance(objectClass, "Class cannot be null.");
+		requireNonNull(objectClass, "Class cannot be null.");
 		if(isCommonLoggerSupported() && classLoggerMap.isEmpty()) { //if using the common logger is supported and there are no mappings
 			return determineCommonLogger(); //return the common logger, creating it if necessary
 		}

@@ -22,8 +22,9 @@ import com.globalmentor.io.InputStreamDecorator;
 
 import static java.lang.Math.*;
 import static java.nio.charset.StandardCharsets.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An input stream that logs all transferred bytes of a decorated stream.
@@ -55,7 +56,7 @@ public class LogInputStream extends InputStreamDecorator<InputStream> {
 	 */
 	public LogInputStream(final InputStream inputStream, final Log.Level logLevel) {
 		super(inputStream); //construct the parent class
-		this.logLevel = checkInstance(logLevel, "Log level cannot be null.");
+		this.logLevel = requireNonNull(logLevel, "Log level cannot be null.");
 	}
 
 	/** Indicates whether the end-of-transmission has been detected and logged. */

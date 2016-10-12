@@ -21,8 +21,9 @@ import java.io.*;
 import com.globalmentor.io.OutputStreamDecorator;
 
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Objects.*;
+
 import static java.nio.charset.StandardCharsets.*;
+import static java.util.Objects.*;
 
 /**
  * An output stream that logs all transferred bytes of a decorated stream.
@@ -51,7 +52,7 @@ public class LogOutputStream extends OutputStreamDecorator<OutputStream> {
 	 */
 	public LogOutputStream(final OutputStream outputStream, final Log.Level logLevel) {
 		super(outputStream); //construct the parent class
-		this.logLevel = checkInstance(logLevel, "Log level cannot be null.");
+		this.logLevel = requireNonNull(logLevel, "Log level cannot be null.");
 	}
 
 	@Override

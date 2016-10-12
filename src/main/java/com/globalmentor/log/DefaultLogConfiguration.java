@@ -19,13 +19,14 @@ package com.globalmentor.log;
 import java.io.*;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.collections.*;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Disposable;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * The configuration for default logging.
@@ -60,7 +61,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @throws NullPointerException if the given levels is <code>null</code>.
 	 */
 	public void setLevels(final Set<Log.Level> levels) {
-		this.levels = unmodifiableSet(EnumSet.copyOf(checkInstance(levels, "Levels cannot be null.")));
+		this.levels = unmodifiableSet(EnumSet.copyOf(requireNonNull(levels, "Levels cannot be null.")));
 	}
 
 	/**
@@ -97,7 +98,7 @@ public class DefaultLogConfiguration extends AbstractAffiliationLogConfiguration
 	 * @throws NullPointerException if the given report is <code>null</code>.
 	 */
 	public void setReport(final Set<Log.Report> report) {
-		this.report = unmodifiableSet(EnumSet.copyOf(checkInstance(report, "Report cannot be null.")));
+		this.report = unmodifiableSet(EnumSet.copyOf(requireNonNull(report, "Report cannot be null.")));
 	}
 
 	/** @return The file to use for logging, or <code>null</code> if no file is to be used. */

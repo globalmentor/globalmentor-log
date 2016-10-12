@@ -21,11 +21,11 @@ import java.text.*;
 import java.util.*;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.StackTrace;
 import com.globalmentor.model.ConfigurationException;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.log.Log.*;
 
@@ -74,7 +74,7 @@ public class DefaultLogger extends AbstractLogger {
 	 * @throws NullPointerException if the given levels is <code>null</code>.
 	 */
 	public void setLevels(final Set<Log.Level> levels) {
-		this.levels = unmodifiableSet(EnumSet.copyOf(checkInstance(levels, "Levels cannot be null.")));
+		this.levels = unmodifiableSet(EnumSet.copyOf(requireNonNull(levels, "Levels cannot be null.")));
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class DefaultLogger extends AbstractLogger {
 	 * @throws NullPointerException if the given report is <code>null</code>.
 	 */
 	public void setReport(final Set<Log.Report> report) {
-		this.report = unmodifiableSet(EnumSet.copyOf(checkInstance(report, "Report cannot be null.")));
+		this.report = unmodifiableSet(EnumSet.copyOf(requireNonNull(report, "Report cannot be null.")));
 	}
 
 	/** The file being used for logging, or <code>null</code> if no file is being used. */
@@ -171,7 +171,7 @@ public class DefaultLogger extends AbstractLogger {
 	 * @param standardOutput Whether information should also be sent to {@link System#out} or {@link System#err} as appropriate.
 	 */
 	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final File file, final boolean standardOutput) {
-		this.logConfiguration = checkInstance(logConfiguration, "Log configuration must be provided.");
+		this.logConfiguration = requireNonNull(logConfiguration, "Log configuration must be provided.");
 		this.file = file; //save the file, if any
 		this.standardOutput = standardOutput;
 	}
@@ -195,7 +195,7 @@ public class DefaultLogger extends AbstractLogger {
 	 */
 	public DefaultLogger(final DefaultLogConfiguration logConfiguration, final Writer writer, final boolean standardOutput) {
 		this(logConfiguration, (File)null, standardOutput); //construct the class with no file 
-		this.writer = checkInstance(writer, "Writer cannot be null.");
+		this.writer = requireNonNull(writer, "Writer cannot be null.");
 	}
 
 	/**
