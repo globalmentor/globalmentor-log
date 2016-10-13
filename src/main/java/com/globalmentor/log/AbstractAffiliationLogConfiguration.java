@@ -16,7 +16,7 @@
 
 package com.globalmentor.log;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * An abstract logging configuration that allows several predefined ways to affiliate loggers with classes. By default this class using
@@ -47,7 +47,7 @@ public abstract class AbstractAffiliationLogConfiguration extends AbstractLogCon
 	 * @param affiliation The granularity with which loggers are associated with classes.
 	 */
 	public void setAffiliation(final Affiliation affiliation) {
-		this.affiliation = checkInstance(affiliation, "Affiliation cannot be null.");
+		this.affiliation = requireNonNull(affiliation, "Affiliation cannot be null.");
 	}
 
 	/**
@@ -65,7 +65,7 @@ public abstract class AbstractAffiliationLogConfiguration extends AbstractLogCon
 		final Affiliation affiliation = getAffiliation();
 		switch(affiliation) {
 			case CLASS:
-				return checkInstance(objectClass);
+				return requireNonNull(objectClass);
 			case PACKAGE:
 				return objectClass.getPackage();
 			default:

@@ -16,7 +16,7 @@
 
 package com.globalmentor.log;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * A logger that delegates to another type of logger.
@@ -39,7 +39,7 @@ public abstract class AbstractAdapterLogger<L> extends AbstractLogger {
 	 * @throws NullPointerException if the given logger is <code>null</code>.
 	 */
 	public AbstractAdapterLogger(final L logger) {
-		this.logger = checkInstance(logger, "Logger cannot be null.");
+		this.logger = requireNonNull(logger, "Logger cannot be null.");
 	}
 
 }
