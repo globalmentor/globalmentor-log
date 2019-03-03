@@ -18,6 +18,8 @@ package com.globalmentor.log;
 
 import static com.globalmentor.java.Characters.*;
 
+import java.util.Optional;
+
 import com.globalmentor.lex.Identifier;
 
 import io.csar.Csar;
@@ -83,18 +85,18 @@ public final class Log {
 	 * @return The default log configuration.
 	 * @see Csar#getDefaultConcern(Class)
 	 */
-	public static LogConfiguration getDefaultConfiguration() {
+	public static Optional<LogConfiguration> getDefaultConfiguration() {
 		return Csar.getDefaultConcern(LogConfiguration.class);
 	}
 
 	/**
 	 * Sets the default log configuration.
 	 * @param logConfiguration The configuration to set.
-	 * @return The previous configuration, or <code>null</code> if there was no previous configuration.
+	 * @return The previous configuration, if any.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
 	 * @see Csar#registerDefaultConcern(Class, io.csar.Concern)
 	 */
-	public static LogConfiguration setDefaultConfiguration(final LogConfiguration logConfiguration) {
+	public static Optional<LogConfiguration> setDefaultConfiguration(final LogConfiguration logConfiguration) {
 		return Csar.registerDefaultConcern(LogConfiguration.class, logConfiguration);
 	}
 
