@@ -26,12 +26,11 @@
 		<dependency>
 			<groupId>io.csar</groupId>
 			<artifactId>csar</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-base</artifactId>
+			<artifactId>globalmentor-core</artifactId>
 		</dependency>
 
 		<dependency>
