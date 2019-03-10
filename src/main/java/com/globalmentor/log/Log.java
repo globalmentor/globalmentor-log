@@ -83,10 +83,10 @@ public final class Log {
 	 * This method is the preferred approach for determining the default log configuration, as it ensures a default configuration has been installed.
 	 * </p>
 	 * @return The default log configuration.
-	 * @see Csar#getDefaultConcern(Class)
+	 * @see Csar#findDefaultConcern(Class)
 	 */
 	public static Optional<LogConfiguration> getDefaultConfiguration() {
-		return Csar.getDefaultConcern(LogConfiguration.class);
+		return Csar.findDefaultConcern(LogConfiguration.class);
 	}
 
 	/**
