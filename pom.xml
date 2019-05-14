@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.5.0-SNAPSHOT</version>
+		<version>8.5.0</version>
 	</parent>
 
 	<artifactId>globalmentor-log</artifactId>
-	<version>0.6.0</version>
+	<version>0.6.1</version>
 
 	<name>GlobalMentor Log</name>
 	<description>GlobalMentor Java legacy logging library.</description>
