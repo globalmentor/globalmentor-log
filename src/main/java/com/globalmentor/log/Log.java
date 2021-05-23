@@ -39,7 +39,7 @@ import io.csar.Csar;
 public final class Log {
 
 	/** The common name extension for log files. */
-	public static final String NAME_EXTENSION = "log";
+	public static final String FILENAME_EXTENSION = "log";
 
 	/** The initial character that serves as a flag that the log text should be interpreted as literal, raw data with no preface or control characters. */
 	private static final char RAW_FLAG_CHAR = DATA_LINK_ESCAPE_CHAR;
