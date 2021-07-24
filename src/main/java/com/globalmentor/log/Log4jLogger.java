@@ -55,10 +55,9 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	 * appropriate.
 	 */
 	public void trace(final Object... objects) {
-		final Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to Log4j
+		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to Log4j
 		if(throwable != null) { //if a throwable is one of the objects
-			getLogger().trace(formatList(objects, ' ', throwable), throwable); //ignore the throwable in the string, but give it explicitely to log4j
-
+			getLogger().trace(formatList(objects, ' ', throwable), throwable); //ignore the throwable in the string, but give it explicitly to log4j
 		} else {
 			getLogger().trace(formatList(' ', objects));
 		}
@@ -66,11 +65,11 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 
 	@Override
 	public void traceStack(final Object... objects) {
-		Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to log4j
+		Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
 		if(throwable == null) { //if no throwable was given
 			throwable = new Throwable(); //create our own throwable
 		}
-		getLogger().trace(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitely to log4j
+		getLogger().trace(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitly to log4j
 	}
 
 	/**
@@ -78,10 +77,9 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	 * appropriate.
 	 */
 	public void debug(final Object... objects) {
-		final Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to log4j
+		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
 		if(throwable != null) { //if a throwable is one of the objects
-			getLogger().debug(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitely to log4j
-
+			getLogger().debug(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitly to log4j
 		} else {
 			getLogger().debug(formatList(' ', objects));
 		}
@@ -92,10 +90,9 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	 * appropriate.
 	 */
 	public void info(final Object... objects) {
-		final Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to log4j
+		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
 		if(throwable != null) { //if a throwable is one of the objects
-			getLogger().info(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitely to log4j
-
+			getLogger().info(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitly to log4j
 		} else {
 			getLogger().info(formatList(' ', objects));
 		}
@@ -106,10 +103,9 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	 * appropriate.
 	 */
 	public void warn(final Object... objects) {
-		final Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to log4j
+		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
 		if(throwable != null) { //if a throwable is one of the objects
-			getLogger().warn(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitely to log4j
-
+			getLogger().warn(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitly to log4j
 		} else {
 			getLogger().warn(formatList(' ', objects));
 		}
@@ -120,10 +116,9 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	 * appropriate.
 	 */
 	public void error(final Object... objects) {
-		final Throwable throwable = getInstance(objects, Throwable.class); //see if a throwable was given, so that we can give it explicitly to log4j
+		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
 		if(throwable != null) { //if a throwable is one of the objects
-			getLogger().error(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitely to log4j
-
+			getLogger().error(formatList(objects, ' ', throwable), throwable); //ignore the throwable when constructing the string, but give it explicitly to log4j
 		} else {
 			getLogger().error(formatList(' ', objects));
 		}
