@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>globalmentor-log</artifactId>
-	<version>0.6.2-SNAPSHOT</version>
+	<version>0.6.2</version>
 
 	<name>GlobalMentor Log</name>
 	<description>GlobalMentor Java legacy logging library.</description>
