@@ -22,10 +22,8 @@ package com.globalmentor.log;
  * This class provides no global Log4j configuration; the system-level Log4j logging and must be configured externally.
  * </p>
  * @author Garret Wilson
- * @see org.apache.log4j.BasicConfigurator
- * @see org.apache.log4j.PropertyConfigurator
- * @see org.apache.log4j.xml.DOMConfigurator
- * @see org.apache.log4j.Logger
+ * @see org.apache.logging.log4j.Logger
+ * @see org.apache.logging.log4j.LogManager
  */
 public class Log4jLogConfiguration extends AbstractAffiliationLogConfiguration {
 
@@ -39,15 +37,15 @@ public class Log4jLogConfiguration extends AbstractAffiliationLogConfiguration {
 	 * @param objectClass The specific class for which a logger should be returned.
 	 * @return A new logger instance for the given class.
 	 * @see #getLoggerKey(Class)
-	 * @see org.apache.log4j.Logger#getLogger(String)
+	 * @see org.apache.logging.log4j.LogManager#getLogger(String)
 	 */
 	public Logger createLogger(final Class<?> objectClass) {
 		final Object loggerKey = getLoggerKey(objectClass); //get a key for associating the class to a logger
-		final org.apache.log4j.Logger logger;
+		final org.apache.logging.log4j.Logger logger;
 		if(loggerKey instanceof Class<?>) { //if the logger key is a class
-			logger = org.apache.log4j.Logger.getLogger((Class<?>)loggerKey); //get a logger based upon the class
+			logger = org.apache.logging.log4j.LogManager.getLogger((Class<?>)loggerKey); //get a logger based upon the class
 		} else { //if the logger key is any other type of objects
-			logger = org.apache.log4j.Logger.getLogger(loggerKey.toString()); //get a logger based upon the string form of the key
+			logger = org.apache.logging.log4j.LogManager.getLogger(loggerKey.toString()); //get a logger based upon the string form of the key
 		}
 		return new Log4jLogger(logger); //return a logger for the Log4j logger
 	}

@@ -26,33 +26,33 @@ import static com.globalmentor.text.TextFormatter.*;
  * </p>
  * <dl>
  * <dt>{@link Log.Level#TRACE}</dt>
- * <dd>{@link org.apache.log4j.Level#TRACE}</dd>
+ * <dd>{@link org.apache.logging.log4j.Level#TRACE}</dd>
  * <dt>{@link Log.Level#DEBUG}</dt>
- * <dd>{@link org.apache.log4j.Level#DEBUG}</dd>
+ * <dd>{@link org.apache.logging.log4j.Level#DEBUG}</dd>
  * <dt>{@link Log.Level#INFO}</dt>
- * <dd>{@link org.apache.log4j.Level#INFO}</dd>
+ * <dd>{@link org.apache.logging.log4j.Level#INFO}</dd>
  * <dt>{@link Log.Level#WARN}</dt>
- * <dd>{@link org.apache.log4j.Level#WARN}</dd>
+ * <dd>{@link org.apache.logging.log4j.Level#WARN}</dd>
  * <dt>{@link Log.Level#ERROR}</dt>
- * <dd>{@link org.apache.log4j.Level#ERROR}</dd>
+ * <dd>{@link org.apache.logging.log4j.Level#ERROR}</dd>
  * </dl>
  * @author Garret Wilson
- * @see org.apache.log4j.Logger
+ * @see org.apache.logging.log4j.Logger
  */
-public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> {
+public class Log4jLogger extends AbstractAdapterLogger<org.apache.logging.log4j.Logger> {
 
 	/**
 	 * Java logger constructor.
 	 * @param logger The Java logger delegate.
 	 * @throws NullPointerException if the given logger is <code>null</code>.
 	 */
-	public Log4jLogger(final org.apache.log4j.Logger logger) {
+	public Log4jLogger(final org.apache.logging.log4j.Logger logger) {
 		super(logger);
 	}
 
 	/**
-	 * {@inheritDoc} This method delegates to {@link org.apache.log4j.Logger#trace(Object)} or {@link org.apache.log4j.Logger#trace(Object, Throwable)} as
-	 * appropriate.
+	 * {@inheritDoc} This method delegates to {@link org.apache.logging.log4j.Logger#trace(Object)} or
+	 * {@link org.apache.logging.log4j.Logger#trace(Object, Throwable)} as appropriate.
 	 */
 	public void trace(final Object... objects) {
 		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to Log4j
@@ -73,8 +73,8 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	}
 
 	/**
-	 * {@inheritDoc} This method delegates to {@link org.apache.log4j.Logger#debug(Object)} or {@link org.apache.log4j.Logger#debug(Object, Throwable)} as
-	 * appropriate.
+	 * {@inheritDoc} This method delegates to {@link org.apache.logging.log4j.Logger#debug(Object)} or
+	 * {@link org.apache.logging.log4j.Logger#debug(Object, Throwable)} as appropriate.
 	 */
 	public void debug(final Object... objects) {
 		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
@@ -86,8 +86,8 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	}
 
 	/**
-	 * {@inheritDoc} This method delegates to {@link org.apache.log4j.Logger#info(Object)} or {@link org.apache.log4j.Logger#info(Object, Throwable)} as
-	 * appropriate.
+	 * {@inheritDoc} This method delegates to {@link org.apache.logging.log4j.Logger#info(Object)} or
+	 * {@link org.apache.logging.log4j.Logger#info(Object, Throwable)} as appropriate.
 	 */
 	public void info(final Object... objects) {
 		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
@@ -99,8 +99,8 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	}
 
 	/**
-	 * {@inheritDoc} This method delegates to {@link org.apache.log4j.Logger#warn(Object)} or {@link org.apache.log4j.Logger#warn(Object, Throwable)} as
-	 * appropriate.
+	 * {@inheritDoc} This method delegates to {@link org.apache.logging.log4j.Logger#warn(Object)} or
+	 * {@link org.apache.logging.log4j.Logger#warn(Object, Throwable)} as appropriate.
 	 */
 	public void warn(final Object... objects) {
 		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j
@@ -112,8 +112,8 @@ public class Log4jLogger extends AbstractAdapterLogger<org.apache.log4j.Logger> 
 	}
 
 	/**
-	 * {@inheritDoc} This method delegates to {@link org.apache.log4j.Logger#error(Object)} or {@link org.apache.log4j.Logger#error(Object, Throwable)} as
-	 * appropriate.
+	 * {@inheritDoc} This method delegates to {@link org.apache.logging.log4j.Logger#error(Object)} or
+	 * {@link org.apache.logging.log4j.Logger#error(Object, Throwable)} as appropriate.
 	 */
 	public void error(final Object... objects) {
 		final Throwable throwable = findFirstInstance(objects, Throwable.class).orElse(null); //see if a throwable was given, so that we can give it explicitly to log4j

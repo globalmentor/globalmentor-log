@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>globalmentor-log</artifactId>
-	<version>0.6.2</version>
+	<version>0.6.3</version>
 
 	<name>GlobalMentor Log</name>
 	<description>GlobalMentor Java legacy logging library.</description>
@@ -34,9 +34,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.14.1</version>
 			<!-- this artifact is only needed if Log4j logging is used with the com.globalmentor.log package, and must be explicitly included in any such projects -->
 			<optional>true</optional>
 		</dependency>
